@@ -518,7 +518,7 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         chart_url = f"{base_url_github}{filename_html}"
 
         # --- Summary message ---
-        params = {'isin': df_ticker['isin'].iloc[0]}
+        params = {'isin': df_ticker['isin'].iloc[0].strip()}
         broker_url = f"{base_url_scalable}{urllib.parse.urlencode(params)}"
 
         # --- Compute main summary flags ---
