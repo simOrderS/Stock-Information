@@ -32,10 +32,15 @@ DATA_FILE_DAX = "history_DAX40_gettex.csv"
 LIST_DAX = 'liste_DAX40_OnVista.csv'
 
 
-def send_telegram(method_name, text=None, document=None, filename=None, caption=None):
+def send_telegram(method_name, text=None, url=None, document=None, filename=None, caption=None):
     TOKEN = TELEGRAM_TOKEN_SANDBOX
     API_URL = f'https://api.telegram.org/bot{TOKEN}/{method_name}'
 
+    keyboard = {
+        "inline_keyboard": [
+            [{"text": "Open Stock", "url": url}]
+        ]
+    }
     params_text = {
         'chat_id': TELEGRAM_CHAT_ID,
         'text': text,
@@ -45,7 +50,8 @@ def send_telegram(method_name, text=None, document=None, filename=None, caption=
         'chat_id': TELEGRAM_CHAT_ID,
         'caption': caption,
         'parse_mode': 'HTML',
-        'disable_notification': True
+        'disable_notification': True,
+        'reply_markup': json.dumps(keyboard)
     }
 
     try:
@@ -481,8 +487,9 @@ def plot_chart(df, title):
 
 
 def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: bool = False):
-    base_url = 'https://de.scalable.capital/broker/search/derivatives/'
-    params = {'strategy': 'LONG', 'tab': 'factors'}
+    base_url_scalable = 'https://de.scalable.capital/broker/secutity?'
+    #https://de.scalable.capital/broker/security?isin=DE0007164600&portfolioId=cns3t2c78AFERemuBBek9Q
+    base_url_github = 'https://github.com/simOrderS/Stock-Information/blob/main/'
 
     cutoff_date = pd.Timestamp.today().normalize() - pd.Timedelta(days=period_days)
     df_recent = df_stocks[df_stocks['date'] > cutoff_date].copy()
@@ -502,15 +509,17 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         fig = plot_chart(df_ticker, title=title)
 
         # --- Save static image (optional) ---
-        filename_png = f"{ticker}.png"
+        filename_png = f"{ticker}.png".replace(" ", "_")
         fig.write_image(filename_png)
 
         # --- Save interactive HTML ---
-        filename_html = f"Charts/{ticker}.html"
+        filename_html = f"Charts/{ticker}.html".replace(" ", "_")
         fig.write_html(filename_html, include_plotlyjs='cdn', full_html=True)
+        chart_url = f"{base_url_github}{filename_html}"
 
         # --- Summary message ---
-        broker_url = f"{base_url}{df_ticker['isin'].iloc[0]}?{urllib.parse.urlencode(params)}"
+        params = {'isin': df_ticker['isin'].iloc[0]}
+        broker_url = f"{base_url_scalable}{urllib.parse.urlencode(params)}"
 
         # --- Compute main summary flags ---
         trend = "ON ✅" if latest_row["trend_long"] else "OFF ❌"
@@ -539,7 +548,7 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
             f"ADX: {adx_flag}\n"
         )
 
-        send_telegram("sendPhoto", filename=filename_png, caption=summary)
+        send_telegram("sendPhoto", filename=filename_png, caption=summary, url=chart_url)
 
         if os.path.exists(filename_png):
             os.remove(filename_png)
