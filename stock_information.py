@@ -7,7 +7,7 @@ import urllib.parse
 import numpy as np
 import pandas as pd
 import requests
-import html
+import re
 import traceback
 from datetime import datetime, timezone
 from copy import deepcopy
@@ -508,12 +508,13 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         title = f"{ticker} · {df_ticker['isin'].iloc[0]} · {latest_row['date'].strftime('%d.%m.%Y')}"
         fig = plot_chart(df_ticker, title=title)
 
+        clean_ticker = re.sub(r'[^A-Za-z0-9]', '', ticker)
         # --- Save static image (optional) ---
-        filename_png = f"{ticker}.png".replace(" ", "_")
+        filename_png = f"{clean_ticker}.png"
         fig.write_image(filename_png)
 
         # --- Save interactive HTML ---
-        filename_html = f"Charts/{ticker}.html".replace(" ", "_")
+        filename_html = f"docs/{clean_ticker}.html"
         fig.write_html(filename_html, include_plotlyjs='cdn', full_html=True)
         chart_url = f"{base_url_github}{filename_html}"
 
