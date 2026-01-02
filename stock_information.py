@@ -1,0 +1,567 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+import os
+import json
+import urllib.parse
+import numpy as np
+import pandas as pd
+import requests
+import html
+import traceback
+from datetime import datetime, timezone
+from copy import deepcopy
+from tqdm import tqdm
+
+from ta.trend import EMAIndicator, MACD, ADXIndicator
+from ta.volatility import AverageTrueRange
+from ta.momentum import RSIIndicator
+
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+pd.set_option('max_colwidth', None)
+pd.options.display.max_rows = 10
+pd.options.display.float_format = '{:0.2f}'.format
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+TELEGRAM_TOKEN_INDEX = os.getenv("TELEGRAM_TOKEN_INDEX")
+TELEGRAM_TOKEN_SANDBOX = os.getenv("TELEGRAM_TOKEN_SANDBOX")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+DATA_FILE_DAX = "history_DAX40_gettex.csv"
+LIST_DAX = 'liste_DAX40_OnVista.csv'
+
+
+def send_telegram(method_name, text=None, document=None, filename=None, caption=None):
+    TOKEN = TELEGRAM_TOKEN_SANDBOX
+    API_URL = f'https://api.telegram.org/bot{TOKEN}/{method_name}'
+
+    params_text = {
+        'chat_id': TELEGRAM_CHAT_ID,
+        'text': text,
+        'parse_mode': 'HTML'
+    }
+    params_file = {
+        'chat_id': TELEGRAM_CHAT_ID,
+        'caption': caption,
+        'parse_mode': 'HTML',
+        'disable_notification': True
+    }
+
+    try:
+        if method_name == 'sendMessage':
+            r = requests.post(url=API_URL, params=params_text)
+        elif method_name == 'sendDocument':
+            r = requests.post(url=API_URL, params=params_file, files={'document': open(filename, 'rb')})
+        elif method_name == 'sendPhoto':
+            r = requests.post(url=API_URL, params=params_file, files={'photo': open(filename, 'rb')})
+        else:
+            print("Unknown method_name:", method_name)
+            return False
+
+        resp_json = r.json()
+        if resp_json.get('ok'):
+            msg_link = f"https://t.me/{resp_json['result']['from']['username']}/{resp_json['result']['message_id']}"
+            return True
+        else:
+            print("Telegram API error:", resp_json)
+            return False
+
+    except Exception as e:
+        print("Telegram sending failed:", e)
+        return False
+
+
+def get_stock_data(list_file, start_date, range_):
+    df_list = pd.read_csv(list_file)
+
+    df_stocks = pd.DataFrame(columns=[
+        'ticker','isin','branche','idNotation','isoCurrency',
+        'date','open','close','high','low','volume'
+    ])
+
+    for ind in tqdm(df_list.index, desc='Retrieving data...'):
+        idNotation = df_list.loc[ind, 'idNotation']
+        url = (
+            f"https://api.onvista.de/api/v1/instruments/STOCK/{idNotation}"
+            f"/eod_history?idNotation={idNotation}&range={range_}&startDate={start_date}"
+        )
+
+        r = requests.get(url)
+        parsed = r.json()
+
+        if "datetimeLast" not in parsed:
+            continue
+
+        rows = []
+        for i, ts in enumerate(parsed["datetimeLast"]):
+            rows.append({
+                "ticker": df_list.loc[ind, "ticker"],
+                "isin": df_list.loc[ind, "isin"],
+                "branche": df_list.loc[ind, "branche"],
+                "idNotation": idNotation,
+                "isoCurrency": parsed.get("isoCurrency"),
+                "date": datetime.fromtimestamp(ts, tz=timezone.utc),
+                "open": parsed["first"][i],
+                "close": parsed["last"][i],
+                "high": parsed["high"][i],
+                "low": parsed["low"][i],
+                "volume": parsed["volume"][i] if "volume" in parsed else None
+            })
+
+        df_stocks = pd.concat([df_stocks, pd.DataFrame(rows)])
+
+    df_stocks.sort_values(["ticker","date"], inplace=True)
+    #df_indexes.to_csv(data_file, index=False)
+    
+    return df_stocks
+
+
+def update_stock_data(list_file, df):
+    start_date = df.date.max()
+
+    df_market = pd.read_csv(list_file)
+
+    df_update_list = []
+
+    for ind in tqdm(df_market.index, desc='Retrieving data...'):
+        ticker = df_market.loc[ind, 'ticker']
+        isin = df_market.loc[ind, 'isin']
+        branche = df_market.loc[ind, 'branche']
+        idNotation = df_market.loc[ind, 'idNotation']
+
+        url = (
+            f"https://api.onvista.de/api/v1/instruments/STOCK/{idNotation}"
+            f"/eod_history?idNotation={idNotation}&range=M1&startDate={start_date}"
+        )
+
+        r = requests.get(url)
+        if r.status_code != 200:
+            continue
+
+        parsed = r.json()
+        if "datetimeLast" not in parsed:
+            continue
+
+        results = []
+        for idx, ts in enumerate(parsed["datetimeLast"]):
+            results.append({
+                "ticker": ticker,
+                "isin": isin,
+                "branche": branche,
+                "idNotation": idNotation,
+                "isoCurrency": parsed.get("isoCurrency"),
+                "date": datetime.fromtimestamp(ts, tz=timezone.utc),
+                "open": parsed["first"][idx],
+                "close": parsed["last"][idx],
+                "high": parsed["high"][idx],
+                "low": parsed["low"][idx],
+                # indexes often have no real volume
+                "volume": parsed["volume"][idx] if "volume" in parsed else None
+            })
+
+        if results:
+            df_update_list.append(pd.DataFrame(results))
+
+    # --- Merge with existing history ---
+    if df_update_list:
+        df_update = pd.concat(df_update_list, ignore_index=True)
+        df_update["date"] = pd.to_datetime(df_update["date"]).dt.tz_localize(None)
+
+        df_stocks = pd.concat([df, df_update], ignore_index=True)
+    else:
+        df_stocks = df.copy()
+
+    # --- Cleanup ---
+    df_stocks.sort_values(by=["ticker", "date"], inplace=True)
+    df_stocks.drop_duplicates(subset=["ticker", "date"], inplace=True)
+    df_stocks.reset_index(drop=True, inplace=True)
+
+    #df_indexes.to_csv(data_file, index=False)
+
+    return df_stocks
+
+
+def setup_database(list_file, data_file):    
+    # Step 1: create file if not exists
+    if not os.path.exists(data_file):
+        df_initial = get_stock_data(list_file, '2021-01-01', 'Y5')
+        df_initial['date'] = pd.to_datetime(df_initial['date']).dt.tz_localize(None)
+        df_initial.to_csv(data_file, index=False)
+        print(f"Initial file {data_file} generated")
+    
+    # Step 2: read existing data
+    df_stocks = pd.read_csv(data_file, dtype={
+        'ticker': 'string', 'isin': 'string', 'market': 'string', 'idNotation': 'string', 'isoCurrency': 'string',
+        'open': 'Float64', 'close': 'Float64', 'high': 'Float64', 'low': 'Float64', 'volume': 'Float64',
+        'numberPrices': 'Float64'
+    })
+    df_stocks['date'] = pd.to_datetime(df_stocks['date']).dt.tz_localize(None)
+    
+    # Step 3: update if needed
+    last_available_date = pd.Timestamp.today().normalize() - pd.Timedelta(days=1)
+    if df_stocks.date.max().normalize() < last_available_date:
+        df_stocks = update_stock_data(list_file, df_stocks)
+        print(f"Stock data updated to {df_stocks.date.max()}")
+    
+    # Step 4: calculate indicators
+    df_stocks = calculate_indicators(df_stocks, include_rsi=True)
+    df_stocks = add_supertrend(df_stocks, atr_period=10, multiplier=3.0)
+    print(f'Indicators calculated up to {df_stocks.date.max()}')
+    
+    return df_stocks
+
+
+def calculate_indicators(df, include_rsi=True):
+    dfs = []
+
+    for ticker in tqdm(df["ticker"].unique(), desc="Calculating indicators"):
+        df_ = df[df["ticker"] == ticker].copy()
+        df_ = df_.sort_values("date").reset_index(drop=True)
+
+        # --- Ensure numeric ---
+        for col in ["open", "high", "low", "close"]:
+            df_[col] = pd.to_numeric(df_[col], errors="coerce")
+
+        # --- Trend ---
+        df_["EMA10"] = EMAIndicator(df_["close"], window=10).ema_indicator()
+        df_["EMA20"] = EMAIndicator(df_["close"], window=20).ema_indicator()
+        df_["EMA200"] = EMAIndicator(df_["close"], window=200).ema_indicator()
+
+        df_["trend_long"] = df_["close"] > df_["EMA200"]
+
+        # --- Volatility ---
+        atr = AverageTrueRange(
+            high=df_["high"],
+            low=df_["low"],
+            close=df_["close"],
+            window=14
+        )
+        df_["ATR14"] = atr.average_true_range()
+
+        # --- Volatility baseline ---
+        df_["ATR14_mean"] = df_["ATR14"].rolling(50, min_periods=20).mean()
+        df_["vol_factor"] = df_["ATR14"] / df_["ATR14_mean"]
+
+        # --- Momentum ---
+        macd = MACD(df_["close"], window_fast=12, window_slow=26, window_sign=9)
+        df_["MACDhist"] = macd.macd_diff()
+
+        df_["momentum_norm"] = df_["MACDhist"] / df_["ATR14"]
+
+        # --- Regime ---
+        adx = ADXIndicator(
+            high=df_["high"].ffill(),
+            low=df_["low"].ffill(),
+            close=df_["close"].ffill(),
+            window=14
+        )
+        df_["ADX14"] = adx.adx()
+
+        # --- Optional RSI ---
+        if include_rsi:
+            df_["RSI14"] = RSIIndicator(df_["close"], window=14).rsi()
+
+        dfs.append(df_)
+
+    return pd.concat(dfs, ignore_index=True)
+
+
+def compute_supertrend(df, atr_period=10, multiplier=3.0):
+    df = df.copy()
+
+    # --- Ensure no missing values at start ---
+    df["close"] = df["close"].ffill()
+    df["high"] = df["high"].ffill()
+    df["low"] = df["low"].ffill()
+
+    high, low, close = df["high"], df["low"], df["close"]
+
+    # --- True Range ---
+    tr = np.maximum(high - low,
+                    np.maximum(abs(high - close.shift(1)), abs(low - close.shift(1))))
+    tr.iloc[0] = high.iloc[0] - low.iloc[0]  # first row safe
+
+    # --- ATR (Wilder) ---
+    atr = tr.ewm(alpha=1/atr_period, adjust=False).mean()
+
+    # --- Base bands ---
+    hl2 = (high + low) / 2
+    up = hl2 - multiplier * atr
+    dn = hl2 + multiplier * atr
+
+    # --- Adjust bands like Pine Script ---
+    up1 = up.copy()
+    dn1 = dn.copy()
+    up1.iloc[0] = up.iloc[0]
+    dn1.iloc[0] = dn.iloc[0]
+
+    for i in range(1, len(df)):
+        up1.iloc[i] = max(up.iloc[i], up1.iloc[i-1]) if close.iloc[i-1] > up1.iloc[i-1] else up.iloc[i]
+        dn1.iloc[i] = min(dn.iloc[i], dn1.iloc[i-1]) if close.iloc[i-1] < dn1.iloc[i-1] else dn.iloc[i]
+
+    # --- Supertrend direction ---
+    trend = np.ones(len(df))
+    for i in range(1, len(df)):
+        if trend[i-1] == -1 and close.iloc[i] > dn1.iloc[i-1]:
+            trend[i] = 1
+        elif trend[i-1] == 1 and close.iloc[i] < up1.iloc[i-1]:
+            trend[i] = -1
+        else:
+            trend[i] = trend[i-1]
+
+    # --- Supertrend line ---
+    supertrend = np.where(trend == 1, up1, dn1)
+
+    df["supertrend_dir"] = trend
+    df["supertrend"] = supertrend
+    df["supertrend_up"] = up1
+    df["supertrend_dn"] = dn1
+
+    return df
+
+
+def add_supertrend(df, atr_period=10, multiplier=3.0):
+    dfs = []
+    for ticker in df["ticker"].unique():
+        df_t = df[df["ticker"] == ticker].sort_values("date")
+        df_t = compute_supertrend(df_t, atr_period, multiplier)
+        dfs.append(df_t)
+
+    df = pd.concat(dfs, ignore_index=True)
+    df["supertrend_dir_prev"] = df.groupby("ticker")["supertrend_dir"].shift(1)
+    return df
+
+
+# ============================================================
+# Supertrend strategy
+# ============================================================
+def strategy_supertrend(row, position=None):
+    # Always HOLD for first row (no previous trend)
+    if pd.isna(row["supertrend_dir_prev"]) or pd.isna(row["supertrend_dir"]):
+        return "HOLD"
+
+    # Buy signal: trend flips from -1 to 1
+    if row["supertrend_dir_prev"] == -1 and row["supertrend_dir"] == 1:
+        return "BUY"
+
+    # Sell signal: trend flips from 1 to -1
+    if row["supertrend_dir_prev"] == 1 and row["supertrend_dir"] == -1:
+        return "SELL"
+
+    return "HOLD"
+
+
+def momentum_colors(df):
+    mom = df['momentum_norm'].fillna(0)
+    delta = mom.diff().fillna(0)
+
+    return np.select(
+        [
+            (mom > 0) & (delta > 0),
+            (mom > 0) & (delta <= 0),
+            (mom < 0) & (delta < 0),
+            (mom < 0) & (delta >= 0),
+        ],
+        ['lime', 'green', 'maroon', 'red'],
+        default='gray'
+    ).tolist()
+
+
+def plot_chart(df, title):
+    strategy = df.get('strategy', pd.Series(index=df.index))
+
+    strategy_symbols = np.select(
+        [strategy == 'BUY', strategy == 'SELL'],
+        ['triangle-up', 'triangle-down'],
+        default='circle'
+    )
+    strategy_colors = np.select(
+        [strategy == 'BUY', strategy == 'SELL'],
+        ['green', 'red'],
+        default='rgba(0,0,0,0)'
+    )
+
+    volume_colors = np.where(df['close'] >= df['open'], 'green', 'red')
+    momentum_bar_colors = momentum_colors(df)
+
+    fig = make_subplots(
+        rows=5,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.02,
+        row_heights=[0.45, 0.1, 0.2, 0.15, 0.1]
+    )
+
+    # --- PRICE + TREND ---
+    fig.add_trace(go.Candlestick(
+        x=df['date'], open=df['open'], high=df['high'], low=df['low'], close=df['close'],
+        name="Price", showlegend=False
+    ), row=1, col=1)
+
+    # EMA traces with legend
+    fig.add_trace(go.Scatter(x=df['date'], y=df['EMA10'], line=dict(color='grey', width=1),
+                             name="EMA10", showlegend=True), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df['date'], y=df['EMA20'], line=dict(color='black', width=1),
+                             name="EMA20", showlegend=True), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df['date'], y=df['EMA200'], line=dict(color='orange', width=2),
+                             name="EMA200", showlegend=True), row=1, col=1)
+
+
+    # --- SUPERTREND ---
+    if "supertrend" in df.columns:
+        fig.add_trace(go.Scatter(x=df['date'],y=df['supertrend'].where(df['supertrend_dir'] == 1),
+                mode='lines', line=dict(color='green', width=2), name='Supertrend UP',
+                showlegend=True), row=1, col=1)
+
+        fig.add_trace(go.Scatter(x=df['date'], y=df['supertrend'].where(df['supertrend_dir'] == -1),
+                mode='lines', line=dict(color='red', width=2), name='Supertrend DOWN', showlegend=True), row=1, col=1)
+
+    # --- VOLUME ---
+    fig.add_trace(go.Bar(x=df['date'], y=df['volume'], marker_color=volume_colors,
+                         name="Volume", showlegend=False), row=2, col=1)
+
+    # --- MOMENTUM ---
+    fig.add_trace(go.Bar(x=df['date'], y=df['momentum_norm'], marker_color=momentum_bar_colors,
+                         name="Momentum (norm)", showlegend=False), row=3, col=1)
+    fig.add_trace(go.Scatter(x=df['date'], y=[0]*len(df), line=dict(color='black', width=1),
+                             name="Zero", showlegend=False), row=3, col=1)
+    fig.add_trace(go.Scatter(x=df['date'], y=df['momentum_norm'], mode='markers',
+                             marker=dict(symbol=strategy_symbols, size=12, color=strategy_colors),
+                             name="Signals", showlegend=False), row=3, col=1)
+
+    # --- RSI ---
+    RSI_OVERBOUGHT = 70
+    RSI_OVERSOLD = 30
+
+    fig.add_trace(go.Scatter(x=df['date'], y=df['RSI14'], line=dict(color='grey', width=2),
+                             name="RSI14", showlegend=False), row=4, col=1)
+
+    fig.add_trace(go.Scatter(x=df['date'], y=[RSI_OVERBOUGHT]*len(df),line=dict(color="red", width=1, dash="dash"),
+                             name="Overbought", showlegend=False), row=4, col=1)
+
+    fig.add_trace(go.Scatter(x=df['date'], y=[RSI_OVERSOLD]*len(df), line=dict(color="green", width=1, dash="dash"),
+                             name="Oversold", showlegend=False), row=4, col=1)
+
+    # --- ADX ---
+    ADX_STRONG_THRESHOLD = 25
+
+    fig.add_trace(go.Scatter(x=df['date'], y=df['ADX14'],line=dict(color='purple', width=2),
+                             name="ADX", showlegend=False), row=5, col=1)
+
+    fig.add_trace(go.Scatter(x=df['date'], y=[ADX_STRONG_THRESHOLD]*len(df),line=dict(color='red', width=1, dash="dash"),
+                             name="Strong Trend", showlegend=False), row=5, col=1)
+
+    # --- Layout with legend at bottom of price row ---
+    fig.update_layout(
+        title=title,
+        height=900,
+        width=1200,
+        xaxis_rangeslider_visible=False,
+        margin=dict(l=20, r=20, t=40, b=20),
+        legend=dict(
+            x=0.5,
+            y=1,
+            xanchor='center',
+            yanchor='top',
+            orientation='h',
+            borderwidth=0,
+            bgcolor='rgba(0,0,0,0)'
+        )
+    )
+
+    fig.update_xaxes(showgrid=True, rangebreaks=[dict(bounds=["sat", "mon"])])
+    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="Volume", row=2, col=1)
+    fig.update_yaxes(title_text="Momentum", row=3, col=1)
+    fig.update_yaxes(title_text="RSI", row=4, col=1)
+    fig.update_yaxes(title_text="ADX", row=5, col=1)
+
+    return fig
+
+
+def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: bool = False):
+    base_url = 'https://de.scalable.capital/broker/search/derivatives/'
+    params = {'strategy': 'LONG', 'tab': 'factors'}
+
+    cutoff_date = pd.Timestamp.today().normalize() - pd.Timedelta(days=period_days)
+    df_recent = df_stocks[df_stocks['date'] > cutoff_date].copy()
+
+    for ticker in tqdm(df_recent['ticker'].unique(), desc='Generating messages...'):
+        df_ticker = df_recent[df_recent['ticker'] == ticker].sort_values('date')
+
+        latest_row = df_ticker.iloc[-1]
+        latest_idx = latest_row.name
+
+        # --- DEBUG PRINT ---
+        #print(f"{ticker}: date={latest_row['date']}, ADX={latest_row['ADX14']:.2f}, "
+        #    f"MOM={latest_row['momentum_norm']:.3f}, vol_factor={latest_row.get('vol_factor',1.0):.2f}")
+
+        # --- Chart ---
+        title = f"{ticker} · {df_ticker['isin'].iloc[0]} · {latest_row['date'].strftime('%d.%m.%Y')}"
+        fig = plot_chart(df_ticker, title=title)
+
+        # --- Save static image (optional) ---
+        filename_png = f"{ticker}.png"
+        fig.write_image(filename_png)
+
+        # --- Save interactive HTML ---
+        filename_html = f"Charts/{ticker}.html"
+        fig.write_html(filename_html, include_plotlyjs='cdn', full_html=True)
+
+        # --- Summary message ---
+        broker_url = f"{base_url}{df_ticker['isin'].iloc[0]}?{urllib.parse.urlencode(params)}"
+
+        # --- Compute main summary flags ---
+        trend = "ON ✅" if latest_row["trend_long"] else "OFF ❌"
+        supertrend_signal = "UP ⬆️" if latest_row["supertrend_dir"] == 1 else "DOWN ⬇️"
+        volatility = "HIGH 🔥" if latest_row["vol_factor"] > 1.2 else "LOW ❄️" if latest_row["vol_factor"] < 0.8 else "NORMAL ⚪️"
+        momentum = "Positive 👍" if latest_row["momentum_norm"] > 0 else "Negative 👎"
+        rsi_flag = ""
+        if pd.isna(latest_row["RSI14"]):
+            rsi_flag = "N/A" 
+        elif latest_row["RSI14"] > 70:
+            rsi_flag = "Overbought ⚠️"
+        elif latest_row["RSI14"] < 30:
+            rsi_flag = "Oversold ⚠️"
+        else:
+            rsi_flag = "Normal ⚪️"
+        adx_flag = "Strong 🔥" if latest_row["ADX14"] > 25 else "Weak ❄️"
+
+        # --- Build summary message ---
+        summary = (
+            f"<b><a href='{broker_url}'>{ticker}</a></b> · {latest_row['date'].strftime('%d.%m.%Y')}\n"
+            f"Trend: {trend}\n"
+            f"Supertrend: {supertrend_signal}\n"
+            f"Volatility: {volatility}\n"
+            f"Momentum: {momentum}\n"
+            f"RSI: {rsi_flag}\n"
+            f"ADX: {adx_flag}\n"
+        )
+
+        send_telegram("sendPhoto", filename=filename_png, caption=summary)
+
+        if os.path.exists(filename_png):
+            os.remove(filename_png)
+
+
+def main():
+
+    try:
+        # --- Update stock data & indicators --- #
+        df_stocks = setup_database(LIST_DAX, DATA_FILE_DAX)
+        
+        # --- LIVE MODE ---
+        generate_messages(df_stocks, period_days=180, plot=False)
+
+    except Exception as e:
+        today_str = datetime.today().strftime("%d.%m.%Y")
+        tb_str = traceback.format_exc()
+        send_telegram('sendMessage', text=f"<b>{today_str} - unexpected error:</b>\n{tb_str}")
+        return
+
+
+if __name__ == "__main__":
+
+    main()
+
