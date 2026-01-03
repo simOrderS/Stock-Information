@@ -207,6 +207,7 @@ def setup_database(list_file, data_file):
     last_available_date = pd.Timestamp.today().normalize() - pd.Timedelta(days=1)
     if df_stocks.date.max().normalize() < last_available_date:
         df_stocks = update_stock_data(list_file, df_stocks)
+        df_stocks.to_csv(data_file, index=False)
         print(f"Stock data updated to {df_stocks.date.max()}")
     
     # Step 4: calculate indicators
@@ -255,6 +256,8 @@ def calculate_indicators(df, include_rsi=True):
         df_["momentum_norm"] = df_["MACDhist"] / df_["ATR14"]
 
         # --- Regime ---
+        df_[["high", "low", "close"]] = df_[["high", "low", "close"]].astype(float)
+
         adx = ADXIndicator(
             high=df_["high"].ffill(),
             low=df_["low"].ffill(),
