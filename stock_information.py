@@ -24,8 +24,7 @@ pd.set_option('max_colwidth', None)
 pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:0.2f}'.format
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-TELEGRAM_TOKEN_INDEX = os.getenv("TELEGRAM_TOKEN_INDEX")
+TELEGRAM_TOKEN_DAX = os.getenv("TELEGRAM_TOKEN_DAX")
 TELEGRAM_TOKEN_SANDBOX = os.getenv("TELEGRAM_TOKEN_SANDBOX")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 DATA_FILE_DAX = "history_DAX40_gettex.csv"
@@ -38,7 +37,7 @@ def send_telegram(method_name, text=None, url=None, document=None, filename=None
 
     keyboard = {
         "inline_keyboard": [
-            [{"text": "Open Stock", "url": url}]
+            [{"text": "interactive chart", "url": url}]
         ]
     }
     params_text = {
@@ -487,69 +486,105 @@ def plot_chart(df, title):
 
 
 def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: bool = False):
-    base_url_scalable = 'https://de.scalable.capital/broker/secutity?'
-    #https://de.scalable.capital/broker/security?isin=DE0007164600&portfolioId=cns3t2c78AFERemuBBek9Q
-    base_url_github = 'https://github.com/simOrderS/Stock-Information/blob/main/'
+    base_url_scalable = "https://de.scalable.capital/broker/secutity?"
+    base_url_github = "https://simorders.github.io/Stock-Information/"
+
+    os.makedirs("docs", exist_ok=True)
 
     cutoff_date = pd.Timestamp.today().normalize() - pd.Timedelta(days=period_days)
-    df_recent = df_stocks[df_stocks['date'] > cutoff_date].copy()
+    df_recent = df_stocks[df_stocks["date"] > cutoff_date].copy()
 
-    for ticker in tqdm(df_recent['ticker'].unique(), desc='Generating messages...'):
-        df_ticker = df_recent[df_recent['ticker'] == ticker].sort_values('date')
+    for ticker in tqdm(df_recent["ticker"].unique(), desc="Generating messages..."):
+        df_ticker = df_recent[df_recent["ticker"] == ticker].sort_values("date")
 
-        latest_row = df_ticker.iloc[-1]
-        latest_idx = latest_row.name
+        if len(df_ticker) < 2:
+            continue
 
-        # --- DEBUG PRINT ---
-        #print(f"{ticker}: date={latest_row['date']}, ADX={latest_row['ADX14']:.2f}, "
-        #    f"MOM={latest_row['momentum_norm']:.3f}, vol_factor={latest_row.get('vol_factor',1.0):.2f}")
+        latest = df_ticker.iloc[-1]
+        prev = df_ticker.iloc[-2]
 
-        # --- Chart ---
-        title = f"{ticker} · {df_ticker['isin'].iloc[0]} · {latest_row['date'].strftime('%d.%m.%Y')}"
+        # Chart
+        title = f"{ticker} · {df_ticker['isin'].iloc[0]} · {latest['date'].strftime('%d.%m.%Y')}"
         fig = plot_chart(df_ticker, title=title)
 
-        clean_ticker = re.sub(r'[^A-Za-z0-9]', '', ticker)
-        # --- Save static image (optional) ---
+        clean_ticker = re.sub(r"[^A-Za-z0-9]", "", ticker)
+
         filename_png = f"{clean_ticker}.png"
-        fig.write_image(filename_png)
-
-        # --- Save interactive HTML ---
         filename_html = f"docs/{clean_ticker}.html"
-        fig.write_html(filename_html, include_plotlyjs='cdn', full_html=True)
-        chart_url = f"{base_url_github}{filename_html}"
 
-        # --- Summary message ---
-        params = {'isin': df_ticker['isin'].iloc[0].strip()}
+        fig.write_image(filename_png)
+        fig.write_html(filename_html, include_plotlyjs="cdn", full_html=True)
+
+        chart_url = f"{base_url_github}{clean_ticker}.html"
+
+        params = {"isin": df_ticker["isin"].iloc[0], "model": "trade", "security": df_ticker["isin"].iloc[0],}
         broker_url = f"{base_url_scalable}{urllib.parse.urlencode(params)}"
 
-        # --- Compute main summary flags ---
-        trend = "ON ✅" if latest_row["trend_long"] else "OFF ❌"
-        supertrend_signal = "UP ⬆️" if latest_row["supertrend_dir"] == 1 else "DOWN ⬇️"
-        volatility = "HIGH 🔥" if latest_row["vol_factor"] > 1.2 else "LOW ❄️" if latest_row["vol_factor"] < 0.8 else "NORMAL ⚪️"
-        momentum = "Positive 👍" if latest_row["momentum_norm"] > 0 else "Negative 👎"
-        rsi_flag = ""
-        if pd.isna(latest_row["RSI14"]):
-            rsi_flag = "N/A" 
-        elif latest_row["RSI14"] > 70:
-            rsi_flag = "Overbought ⚠️"
-        elif latest_row["RSI14"] < 30:
-            rsi_flag = "Oversold ⚠️"
-        else:
-            rsi_flag = "Normal ⚪️"
-        adx_flag = "Strong 🔥" if latest_row["ADX14"] > 25 else "Weak ❄️"
+        # Trend
+        trend = "ON ✅" if latest["trend_long"] else "OFF ❌"
+        if latest["trend_long"] and not prev["trend_long"]:
+            trend += " <i>➜New❗</i>"
 
-        # --- Build summary message ---
+        # Supertrend
+        supertrend = "UP ✅" if latest["supertrend_dir"] == 1 else "DOWN ❌"
+        if latest["supertrend_dir"] != prev["supertrend_dir"]:
+            supertrend += " <i>➜New❗</i>"
+
+        # Volatility
+        if latest["vol_factor"] > 1.2:
+            volatility = "HIGH ❌"
+        elif latest["vol_factor"] < 0.8:
+            volatility = "LOW ✅"
+        else:
+            volatility = "Normal"
+
+        # Momentum (context
+        momentum = "Positive ✅" if latest["momentum_norm"] > 0 else "Negative ❌"
+        
+        # RSI
+        if pd.isna(latest["RSI14"]):
+            rsi = "N/A"
+        elif latest["RSI14"] > 70:
+            rsi = "Overbought ⚠️"
+        elif latest["RSI14"] < 30:
+            rsi = "Oversold ⚠️"
+        else:
+            rsi = "Normal"
+
+        prev_rsi_state = (
+            "OB" if prev["RSI14"] > 70 else
+            "OS" if prev["RSI14"] < 30 else
+            "N"
+        )
+        curr_rsi_state = (
+            "OB" if latest["RSI14"] > 70 else
+            "OS" if latest["RSI14"] < 30 else
+            "N"
+        )
+        if curr_rsi_state != prev_rsi_state:
+            rsi += " <i>➜New❗</i>"
+
+        # ADX
+        adx = "Strong ✅" if latest["ADX14"] > 25 else "Weak ❌"
+        if latest["ADX14"] > 25 and prev["ADX14"] <= 25:
+            adx += " <i>➜New❗</i>"
+
         summary = (
-            f"<b><a href='{broker_url}'>{ticker}</a></b> · {latest_row['date'].strftime('%d.%m.%Y')}\n"
+            f"<b><a href='{broker_url}'>{ticker}</a></b> · {latest['date'].strftime('%d.%m.%Y')}\n"
             f"Trend: {trend}\n"
-            f"Supertrend: {supertrend_signal}\n"
+            f"Supertrend: {supertrend}\n"
             f"Volatility: {volatility}\n"
             f"Momentum: {momentum}\n"
-            f"RSI: {rsi_flag}\n"
-            f"ADX: {adx_flag}\n"
+            f"RSI: {rsi}\n"
+            f"ADX: {adx}\n"
         )
 
-        send_telegram("sendPhoto", filename=filename_png, caption=summary, url=chart_url)
+        send_telegram(
+            "sendPhoto",
+            filename=filename_png,
+            caption=summary,
+            url=chart_url,
+        )
 
         if os.path.exists(filename_png):
             os.remove(filename_png)
