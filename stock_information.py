@@ -32,7 +32,7 @@ LIST_DAX = 'liste_DAX40_OnVista.csv'
 
 
 def send_telegram(method_name, text=None, url=None, document=None, filename=None, caption=None):
-    TOKEN = TELEGRAM_TOKEN_SANDBOX
+    TOKEN = TELEGRAM_TOKEN_DAX
     API_URL = f'https://api.telegram.org/bot{TOKEN}/{method_name}'
 
     keyboard = {
@@ -489,7 +489,7 @@ def plot_chart(df, title):
 
 
 def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: bool = False):
-    base_url_scalable = "https://de.scalable.capital/broker/secutity?"
+    base_url_scalable = "https://de.scalable.capital/broker/security?"
     base_url_github = "https://simorders.github.io/Stock-Information/"
 
     os.makedirs("docs", exist_ok=True)
@@ -520,7 +520,8 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
 
         chart_url = f"{base_url_github}{clean_ticker}.html"
 
-        params = {"isin": df_ticker["isin"].iloc[0], "model": "trade", "security": df_ticker["isin"].iloc[0],}
+        params = {"isin": df_ticker["isin"].iloc[0]}
+        #params = {'isin': df_ticker['isin'].unique()[0], 'model': 'trade', 'security': df_ticker['isin'].unique()[0], 'type': "BUY"}
         broker_url = f"{base_url_scalable}{urllib.parse.urlencode(params)}"
 
         # Trend
