@@ -5,6 +5,9 @@ on:
     - cron: "0 6 * * 1-5"    # Mon–Fri at 06:00 UTC
   workflow_dispatch:      # also allows manual trigger
 
+permissions:
+  contents: write         # ← FIX: Enables git push for github-actions[bot]
+
 jobs:
   generate-charts:
     runs-on: ubuntu-latest
@@ -47,6 +50,3 @@ jobs:
           git add docs/*.html 2>/dev/null || echo "No HTML files to add"
           git commit -m "Daily update of charts $(date +'%Y-%m-%d')" || echo "No changes to commit"
           git push origin main
-
-
-
