@@ -41,7 +41,7 @@ jobs:
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git add --ignore-missing docs/*.html docs/*.png
+          git add docs/*.html
           git commit -m "Daily update of charts $(date +'%Y-%m-%d')" || echo "No changes to commit"
           git push
 
