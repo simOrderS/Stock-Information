@@ -24,15 +24,15 @@ pd.set_option('max_colwidth', None)
 pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:0.2f}'.format
 
-TELEGRAM_TOKEN_DAX = os.getenv("TELEGRAM_TOKEN_DAX")
+TELEGRAM_TOKEN_INDEX = os.getenv("TELEGRAM_TOKEN_INDEX")
 TELEGRAM_TOKEN_SANDBOX = os.getenv("TELEGRAM_TOKEN_SANDBOX")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-DATA_FILE_DAX = "history_DAX40_gettex.csv"
-LIST_DAX = 'liste_DAX40_OnVista.csv'
+DATA_FILE_INDEX = "history_INDEX.csv"
+LIST_INDEX = 'liste_INDEX_OnVista.csv'
 
 
 def send_telegram(method_name, text=None, url=None, document=None, filename=None, caption=None):
-    TOKEN = TELEGRAM_TOKEN_DAX
+    TOKEN = TELEGRAM_TOKEN_INDEX
     API_URL = f'https://api.telegram.org/bot{TOKEN}/{method_name}'
 
     keyboard = {
@@ -77,10 +77,10 @@ def send_telegram(method_name, text=None, url=None, document=None, filename=None
         return False
 
 
-def get_stock_data(list_file, start_date, range_):
+def get_index_data(list_file, start_date, range_):
     df_list = pd.read_csv(list_file)
 
-    df_stocks = pd.DataFrame(columns=[
+    df_index = pd.DataFrame(columns=[
         'ticker','isin','branche','idNotation','isoCurrency',
         'date','open','close','high','low','volume'
     ])
@@ -88,7 +88,7 @@ def get_stock_data(list_file, start_date, range_):
     for ind in tqdm(df_list.index, desc='Retrieving data...'):
         idNotation = df_list.loc[ind, 'idNotation']
         url = (
-            f"https://api.onvista.de/api/v1/instruments/STOCK/{idNotation}"
+            f"https://api.onvista.de/api/v1/instruments/INDEX/{idNotation}"
             f"/eod_history?idNotation={idNotation}&range={range_}&startDate={start_date}"
         )
 
@@ -114,15 +114,15 @@ def get_stock_data(list_file, start_date, range_):
                 "volume": parsed["volume"][i] if "volume" in parsed else None
             })
 
-        df_stocks = pd.concat([df_stocks, pd.DataFrame(rows)])
+        df_index = pd.concat([df_index, pd.DataFrame(rows)])
 
-    df_stocks.sort_values(["ticker","date"], inplace=True)
+    df_index.sort_values(["ticker","date"], inplace=True)
     #df_indexes.to_csv(data_file, index=False)
     
-    return df_stocks
+    return df_index
 
 
-def update_stock_data(list_file, df):
+def update_index_data(list_file, df):
     start_date = df.date.max()
 
     df_market = pd.read_csv(list_file)
@@ -136,7 +136,7 @@ def update_stock_data(list_file, df):
         idNotation = df_market.loc[ind, 'idNotation']
 
         url = (
-            f"https://api.onvista.de/api/v1/instruments/STOCK/{idNotation}"
+            f"https://api.onvista.de/api/v1/instruments/INDEX/{idNotation}"
             f"/eod_history?idNotation={idNotation}&range=M1&startDate={start_date}"
         )
 
@@ -173,24 +173,24 @@ def update_stock_data(list_file, df):
         df_update = pd.concat(df_update_list, ignore_index=True)
         df_update["date"] = pd.to_datetime(df_update["date"]).dt.tz_localize(None)
 
-        df_stocks = pd.concat([df, df_update], ignore_index=True)
+        df_index = pd.concat([df, df_update], ignore_index=True)
     else:
-        df_stocks = df.copy()
+        df_index = df.copy()
 
     # --- Cleanup ---
-    df_stocks.sort_values(by=["ticker", "date"], inplace=True)
-    df_stocks.drop_duplicates(subset=["ticker", "date"], inplace=True)
-    df_stocks.reset_index(drop=True, inplace=True)
+    df_index.sort_values(by=["ticker", "date"], inplace=True)
+    df_index.drop_duplicates(subset=["ticker", "date"], inplace=True)
+    df_index.reset_index(drop=True, inplace=True)
 
     #df_indexes.to_csv(data_file, index=False)
 
-    return df_stocks
+    return df_index
 
 
 def setup_database(list_file, data_file):    
     # Step 1: create file if not exists
     if not os.path.exists(data_file):
-        df_initial = get_stock_data(list_file, '2021-01-01', 'Y5')
+        df_initial = get_index_data(list_file, '2021-01-01', 'Y5')
         df_initial['date'] = pd.to_datetime(df_initial['date']).dt.tz_localize(None)
         df_initial.to_csv(data_file, index=False)
         print(f"Initial file {data_file} generated")
@@ -206,7 +206,7 @@ def setup_database(list_file, data_file):
     # Step 3: update if needed
     last_available_date = pd.Timestamp.today().normalize() - pd.Timedelta(days=1)
     if df_stocks.date.max().normalize() < last_available_date:
-        df_stocks = update_stock_data(list_file, df_stocks)
+        df_stocks = update_index_data(list_file, df_stocks)
         df_stocks.to_csv(data_file, index=False)
         print(f"Stock data updated to {df_stocks.date.max()}")
     
@@ -494,7 +494,8 @@ def plot_chart(df, title):
 
 
 def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: bool = False):
-    base_url_scalable = "https://de.scalable.capital/broker/security?"
+    base_url_scalable = 'https://de.scalable.capital/broker/search/derivatives/'
+    params = {'strategy': 'LONG', 'tab': 'factors'}
     base_url_github = "https://simorders.github.io/Stock-Information/"
 
     os.makedirs("docs", exist_ok=True)
@@ -525,9 +526,7 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
 
         chart_url = f"{base_url_github}{clean_ticker}.html"
 
-        params = {"isin": df_ticker["isin"].iloc[0]}
-        #params = {'isin': df_ticker['isin'].unique()[0], 'model': 'trade', 'security': df_ticker['isin'].unique()[0], 'type': "BUY"}
-        broker_url = f"{base_url_scalable}{urllib.parse.urlencode(params)}"
+        broker_url = f"{base_url_scalable}{df_ticker['isin'].iloc[0]}?{urllib.parse.urlencode(params)}"
 
         # Trend
         trend = "ON ✅" if latest["trend_long"] else "OFF ❌"
@@ -598,7 +597,7 @@ def main():
 
     try:
         # --- Update stock data & indicators --- #
-        df_stocks = setup_database(LIST_DAX, DATA_FILE_DAX)
+        df_stocks = setup_database(LIST_INDEX, DATA_FILE_INDEX)
         
         # --- LIVE MODE ---
         generate_messages(df_stocks, period_days=180, plot=False)

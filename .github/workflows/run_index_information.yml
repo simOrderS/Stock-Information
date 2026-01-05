@@ -1,8 +1,8 @@
-name: Generate Daily STOCK Charts
+name: Generate Daily INDEX Charts
 
 on:
   schedule:
-    - cron: "30 6 * * 2-6"    # Mon–Fri at 06:30 UTC
+    - cron: "0 6 * * 2-6"    # Mon–Fri at 06:00 UTC
   workflow_dispatch:      # also allows manual trigger
 
 permissions:
@@ -36,11 +36,11 @@ jobs:
       # Step 4: Run your script
       - name: Run stock script
         env:
-          TELEGRAM_TOKEN_DAX: ${{ secrets.TELEGRAM_TOKEN_DAX }}
+          TELEGRAM_TOKEN_INDEX: ${{ secrets.TELEGRAM_TOKEN_INDEX }}
           TELEGRAM_TOKEN_SANDBOX: ${{ secrets.TELEGRAM_TOKEN_SANDBOX }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python stock_information.py
+          python index_information.py
 
       # Step 5: Commit generated charts
       - name: Commit and push charts
