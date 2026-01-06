@@ -29,6 +29,8 @@ TELEGRAM_TOKEN_SANDBOX = os.getenv("TELEGRAM_TOKEN_SANDBOX")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 DATA_FILE_INDEX = "history_INDEX.csv"
 LIST_INDEX = 'liste_INDEX_OnVista.csv'
+SUPERTREND_ATR = 21
+SUPERTREND_MULT = 4.0
 
 
 def send_telegram(method_name, text=None, url=None, document=None, filename=None, caption=None):
@@ -212,7 +214,7 @@ def setup_database(list_file, data_file):
     
     # Step 4: calculate indicators
     df_stocks = calculate_indicators(df_stocks, include_rsi=True)
-    df_stocks = add_supertrend(df_stocks, atr_period=10, multiplier=3.0)
+    df_stocks = add_supertrend(df_stocks, atr_period=SUPERTREND_ATR, multiplier=SUPERTREND_MULT) # Adapted to indexes according to 10-years backtest
     print(f'Indicators calculated up to {df_stocks.date.max()}')
     
     return df_stocks
@@ -339,25 +341,6 @@ def add_supertrend(df, atr_period=10, multiplier=3.0):
     df = pd.concat(dfs, ignore_index=True)
     df["supertrend_dir_prev"] = df.groupby("ticker")["supertrend_dir"].shift(1)
     return df
-
-
-# ============================================================
-# Supertrend strategy
-# ============================================================
-def strategy_supertrend(row, position=None):
-    # Always HOLD for first row (no previous trend)
-    if pd.isna(row["supertrend_dir_prev"]) or pd.isna(row["supertrend_dir"]):
-        return "HOLD"
-
-    # Buy signal: trend flips from -1 to 1
-    if row["supertrend_dir_prev"] == -1 and row["supertrend_dir"] == 1:
-        return "BUY"
-
-    # Sell signal: trend flips from 1 to -1
-    if row["supertrend_dir_prev"] == 1 and row["supertrend_dir"] == -1:
-        return "SELL"
-
-    return "HOLD"
 
 
 def momentum_colors(df):
