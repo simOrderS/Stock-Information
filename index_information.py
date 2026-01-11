@@ -29,8 +29,6 @@ TELEGRAM_TOKEN_SANDBOX = os.getenv("TELEGRAM_TOKEN_SANDBOX")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 DATA_FILE_INDEX = "history_INDEX.csv"
 LIST_INDEX = 'liste_INDEX_OnVista.csv'
-SUPERTREND_ATR = 21
-SUPERTREND_MULT = 4.0
 
 
 def send_telegram(method_name, text=None, url=None, document=None, filename=None, caption=None):
@@ -214,10 +212,33 @@ def setup_database(list_file, data_file):
     
     # Step 4: calculate indicators
     df_stocks = calculate_indicators(df_stocks, include_rsi=True)
-    df_stocks = add_supertrend(df_stocks, atr_period=SUPERTREND_ATR, multiplier=SUPERTREND_MULT) # Adapted to indexes according to 10-years backtest
+    df_stocks = add_supertrend(df_stocks) 
     print(f'Indicators calculated up to {df_stocks.date.max()}')
     
     return df_stocks
+
+
+def get_supertrend_params(ticker: str, filename="optimal_parameters.json"):
+    # Default values
+    default_params = {"atr_period": 21, "multiplier": 4.0}
+
+    # Check if file exists
+    if not os.path.exists(filename):
+        print(f"Warning: {filename} not found. Using default parameters for {ticker}.")
+        return default_params
+
+    # Load JSON
+    with open(filename, "r") as f:
+        data = json.load(f)
+
+    # Try to get ticker parameters
+    params = data.get(ticker, {}).get("optimal_params", default_params)
+
+    # Ensure both keys exist
+    atr_period = params.get("atr_period", default_params["atr_period"])
+    multiplier = params.get("multiplier", default_params["multiplier"])
+
+    return {"atr_period": atr_period, "multiplier": multiplier}
 
 
 def calculate_indicators(df, include_rsi=True):
@@ -331,11 +352,18 @@ def compute_supertrend(df, atr_period=10, multiplier=3.0):
     return df
 
 
-def add_supertrend(df, atr_period=10, multiplier=3.0):
+def add_supertrend(df):
     dfs = []
+
     for ticker in df["ticker"].unique():
         df_t = df[df["ticker"] == ticker].sort_values("date")
-        df_t = compute_supertrend(df_t, atr_period, multiplier)
+
+        # Retrieve ATR and multiplier for this ticker
+        params = get_supertrend_params(ticker)
+        atr_period = params["atr_period"]
+        multiplier = params["multiplier"]
+
+        df_t = compute_supertrend(df_t, atr_period=atr_period, multiplier=multiplier)
         dfs.append(df_t)
 
     df = pd.concat(dfs, ignore_index=True)
@@ -496,7 +524,11 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         prev = df_ticker.iloc[-2]
 
         # Chart
-        title = f"{ticker} · {df_ticker['isin'].iloc[0]} · {latest['date'].strftime('%d.%m.%Y')}"
+        supertrend_params = get_supertrend_params(ticker)
+        atr_period = supertrend_params["atr_period"]
+        multiplier = supertrend_params["multiplier"]
+
+        title = (f"{ticker} · {df_ticker['isin'].iloc[0]} · {latest['date'].strftime('%d.%m.%Y')} · SUP: ATR={atr_period}, M={multiplier}")
         fig = plot_chart(df_ticker, title=title)
 
         clean_ticker = re.sub(r"[^A-Za-z0-9]", "", ticker)
@@ -508,7 +540,6 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         fig.write_html(filename_html, include_plotlyjs="cdn", full_html=True)
 
         chart_url = f"{base_url_github}{clean_ticker}.html"
-
         broker_url = f"{base_url_scalable}{df_ticker['isin'].iloc[0]}?{urllib.parse.urlencode(params)}"
 
         # Trend

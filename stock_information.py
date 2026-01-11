@@ -190,7 +190,7 @@ def update_stock_data(list_file, df):
 def setup_database(list_file, data_file):    
     # Step 1: create file if not exists
     if not os.path.exists(data_file):
-        df_initial = get_stock_data(list_file, '2021-01-01', 'Y5')
+        df_initial = get_stock_data(list_file, '2021-01-01', 'Y1')
         df_initial['date'] = pd.to_datetime(df_initial['date']).dt.tz_localize(None)
         df_initial.to_csv(data_file, index=False)
         print(f"Initial file {data_file} generated")

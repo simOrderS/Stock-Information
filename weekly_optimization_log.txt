@@ -1,0 +1,22 @@
+[2026-01-11 13:10:58] ======================================================================
+[2026-01-11 13:10:58] 🔄 WEEKLY PARAMETER OPTIMIZATION STARTED
+[2026-01-11 13:10:58] ======================================================================
+[2026-01-11 13:10:58] Start Time: 2026-01-11 13:10:58
+[2026-01-11 13:10:58] 
+[2026-01-11 13:10:58] 📋 Loading index list...
+[2026-01-11 13:10:58] ✓ Loaded 7 indices from liste_INDEX_OnVista.csv
+[2026-01-11 13:10:58]   - DAX (DE0008469008)
+[2026-01-11 13:10:58]   - MDAX (DE0008467416)
+[2026-01-11 13:10:58]   - SDAX (DE0009653386)
+[2026-01-11 13:10:58]   - EURO STOXX 50 (EU0009658145)
+[2026-01-11 13:10:58]   - S&P 500 (US78378X1072)
+[2026-01-11 13:10:58]   - Nasdaq 100 (US6311011026)
+[2026-01-11 13:10:58]   - MSCI World (GB00BJDQQQ59)
+[2026-01-11 13:10:58] 
+[2026-01-11 13:10:58] 
+Setting up database...
+[2026-01-11 13:10:58] No backtest_INDEX.csv found. Downloading initial data...
+[2026-01-11 13:10:58] ERROR: AI_trading_INDEX functions not available!
+[2026-01-11 13:10:58] Please ensure AI_trading_INDEX.py is in the same directory.
+[2026-01-11 13:10:58] 
+❌ FAILED: Cannot setup database
