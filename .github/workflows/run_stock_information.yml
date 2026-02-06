@@ -2,7 +2,7 @@ name: Generate Daily STOCK Charts
 
 on:
   schedule:
-    - cron: "30 6 * * 2-6"    # Mon–Fri at 06:30 UTC
+    - cron: "30 5 * * 2-6"    # Mon–Fri at 06:30 UTC
   workflow_dispatch:      # also allows manual trigger
 
 permissions:
