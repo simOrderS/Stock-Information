@@ -213,8 +213,20 @@ def setup_database(list_file, data_file):
     # Step 4: calculate indicators
     df_stocks = calculate_indicators(df_stocks, include_rsi=True)
     df_stocks = add_supertrend(df_stocks, atr_period=10, multiplier=3.0)
+
+    # Step 5: Support & Resistance
+    '''
+    dfs = []
+    for ticker in df_stocks["ticker"].unique():
+        dft = df_stocks[df_stocks["ticker"] == ticker].sort_values("date")
+        dft = add_pivots(dft, left=3, right=3)
+        dft = add_sr_curves(dft, span=20)
+        dfs.append(dft)
+
+    df_stocks = pd.concat(dfs, ignore_index=True)
+    '''
+
     print(f'Indicators calculated up to {df_stocks.date.max()}')
-    
     return df_stocks
 
 
@@ -273,6 +285,44 @@ def calculate_indicators(df, include_rsi=True):
         dfs.append(df_)
 
     return pd.concat(dfs, ignore_index=True)
+
+
+def add_pivots(df, left=3, right=3):
+    df = df.copy()
+    df["pivot_high"] = np.nan
+    df["pivot_low"] = np.nan
+
+    highs = df["high"].values
+    lows = df["low"].values
+
+    for i in range(left, len(df) - right):
+        if highs[i] == max(highs[i-left:i+right+1]):
+            df.iloc[i, df.columns.get_loc("pivot_high")] = highs[i]
+
+        if lows[i] == min(lows[i-left:i+right+1]):
+            df.iloc[i, df.columns.get_loc("pivot_low")] = lows[i]
+
+    return df
+
+
+def add_sr_curves(df, span=20):
+    df = df.copy()
+
+    df["resistance_curve"] = (
+        df["pivot_high"]
+        .ffill()
+        .ewm(span=span, adjust=False)
+        .mean()
+    )
+
+    df["support_curve"] = (
+        df["pivot_low"]
+        .ffill()
+        .ewm(span=span, adjust=False)
+        .mean()
+    )
+
+    return df
 
 
 def compute_supertrend(df, atr_period=10, multiplier=3.0):
@@ -377,35 +427,25 @@ def momentum_colors(df):
 
 
 def plot_chart(df, title):
+
+    # --- Support / Resistance lookback (recent only) ---
+    SR_LOOKBACK = 50
+    df_sr = df.tail(SR_LOOKBACK)
+
     strategy = df.get('strategy', pd.Series(index=df.index))
 
-    strategy_symbols = np.select(
-        [strategy == 'BUY', strategy == 'SELL'],
-        ['triangle-up', 'triangle-down'],
-        default='circle'
-    )
-    strategy_colors = np.select(
-        [strategy == 'BUY', strategy == 'SELL'],
-        ['green', 'red'],
-        default='rgba(0,0,0,0)'
+    strategy_symbols = np.select([strategy == 'BUY', strategy == 'SELL'], ['triangle-up', 'triangle-down'], default='circle')
+    strategy_colors = np.select([strategy == 'BUY', strategy == 'SELL'], ['green', 'red'], default='rgba(0,0,0,0)'
     )
 
     volume_colors = np.where(df['close'] >= df['open'], 'green', 'red')
     momentum_bar_colors = momentum_colors(df)
 
-    fig = make_subplots(
-        rows=5,
-        cols=1,
-        shared_xaxes=True,
-        vertical_spacing=0.02,
-        row_heights=[0.45, 0.1, 0.2, 0.15, 0.1]
-    )
+    fig = make_subplots(rows=5, cols=1, shared_xaxes=True, vertical_spacing=0.02, row_heights=[0.45, 0.1, 0.2, 0.15, 0.1])
 
     # --- PRICE + TREND ---
-    fig.add_trace(go.Candlestick(
-        x=df['date'], open=df['open'], high=df['high'], low=df['low'], close=df['close'],
-        name="Price", showlegend=False
-    ), row=1, col=1)
+    fig.add_trace(go.Candlestick(x=df['date'], open=df['open'], high=df['high'], low=df['low'], close=df['close'],
+                                 name="Price", showlegend=False), row=1, col=1)
 
     # EMA traces with legend
     fig.add_trace(go.Scatter(x=df['date'], y=df['EMA10'], line=dict(color='grey', width=1),
@@ -414,16 +454,54 @@ def plot_chart(df, title):
                              name="EMA20", showlegend=True), row=1, col=1)
     fig.add_trace(go.Scatter(x=df['date'], y=df['EMA200'], line=dict(color='orange', width=2),
                              name="EMA200", showlegend=True), row=1, col=1)
+    
+    # --- EMA corridor dynamic fill ---
+    ema_up = df['EMA10'] > df['EMA20']
+    start_idx = 0
 
+    for i in range(1, len(df)):
+        # segment ends when the order changes OR we reach the last index
+        if ema_up.iloc[i] != ema_up.iloc[start_idx] or i == len(df) - 1:
+            # include last index if end of dataframe
+            end_idx = i + 1 if i == len(df) - 1 else i
+
+            # slice the segment
+            x_seg = df['date'].iloc[start_idx:end_idx]
+            y1_seg = df['EMA10'].iloc[start_idx:end_idx]
+            y2_seg = df['EMA20'].iloc[start_idx:end_idx]
+
+            # EMA10 trace (invisible)
+            fig.add_trace(go.Scatter(x=x_seg, y=y1_seg, line=dict(color='rgba(0,0,0,0)'), showlegend=False), row=1, col=1)
+
+            # EMA20 trace with fill to EMA10
+            fig.add_trace(go.Scatter(x=x_seg, y=y2_seg, fill='tonexty', fillcolor='rgba(0,255,0,0.2)' if ema_up.iloc[start_idx] else 'rgba(255,0,0,0.2)',
+                                     line=dict(color='rgba(0,0,0,0)'), showlegend=False), row=1, col=1)
+            start_idx = i
 
     # --- SUPERTREND ---
     if "supertrend" in df.columns:
         fig.add_trace(go.Scatter(x=df['date'],y=df['supertrend'].where(df['supertrend_dir'] == 1),
-                mode='lines', line=dict(color='green', width=2), name='Supertrend UP',
-                showlegend=True), row=1, col=1)
+                                 mode='lines', line=dict(color='green', width=2), name='Supertrend UP',
+                                 showlegend=True), row=1, col=1)
 
         fig.add_trace(go.Scatter(x=df['date'], y=df['supertrend'].where(df['supertrend_dir'] == -1),
-                mode='lines', line=dict(color='red', width=2), name='Supertrend DOWN', showlegend=True), row=1, col=1)
+                                 mode='lines', line=dict(color='red', width=2), name='Supertrend DOWN', 
+                                 showlegend=True), row=1, col=1)
+        
+    # --- SUPPORT & RESISTANCE CORRIDOR ---
+    '''
+    if "support_curve" in df_sr.columns and df_sr["support_curve"].notna().any() \
+    and "resistance_curve" in df_sr.columns and df_sr["resistance_curve"].notna().any():
+
+        # Resistance line first
+        fig.add_trace(go.Scatter(x=df_sr['date'], y=df_sr['resistance_curve'], mode='lines', line=dict(color='rgba(0,0,0,0)'),
+                                 showlegend=False, name='Resistance'), row=1, col=1)
+
+        # Support line, fill to previous y
+        fig.add_trace(go.Scatter(x=df_sr['date'], y=df_sr['support_curve'], mode='lines', fill='tonexty',
+                                 fillcolor='rgba(0,100,255,0.2)', line=dict(color='rgba(0,0,0,0)'), name='SR Zone',
+                                 showlegend=True), row=1, col=1)
+    '''
 
     # --- VOLUME ---
     fig.add_trace(go.Bar(x=df['date'], y=df['volume'], marker_color=volume_colors,
@@ -461,22 +539,8 @@ def plot_chart(df, title):
                              name="Strong Trend", showlegend=False), row=5, col=1)
 
     # --- Layout with legend at bottom of price row ---
-    fig.update_layout(
-        title=title,
-        height=900,
-        width=1200,
-        xaxis_rangeslider_visible=False,
-        margin=dict(l=20, r=20, t=40, b=20),
-        legend=dict(
-            x=0.5,
-            y=1,
-            xanchor='center',
-            yanchor='top',
-            orientation='h',
-            borderwidth=0,
-            bgcolor='rgba(0,0,0,0)'
-        )
-    )
+    fig.update_layout(title=title, height=900, width=1200, xaxis_rangeslider_visible=False, margin=dict(l=20, r=20, t=40, b=20),
+                      legend=dict(x=0.5, y=1, xanchor='center', yanchor='top', orientation='h', borderwidth=0, bgcolor='rgba(0,0,0,0)'))
 
     fig.update_xaxes(showgrid=True, rangebreaks=[dict(bounds=["sat", "mon"])])
     fig.update_yaxes(title_text="Price", row=1, col=1)
