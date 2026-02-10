@@ -33,7 +33,7 @@ jobs:
           pip install -r requirements.txt
           pip install plotly kaleido
 
-      # Step 4: Run your script
+      # Step 4: Run DAX script
       - name: Run stock script
         env:
           TELEGRAM_TOKEN_DAX: ${{ secrets.TELEGRAM_TOKEN_DAX }}
@@ -41,6 +41,15 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python stock_information_DAX.py
+
+      # Step 5: Run MDAX script
+      - name: Run stock script
+        env:
+          TELEGRAM_TOKEN_MDAX: ${{ secrets.TELEGRAM_TOKEN_MDAX }}
+          TELEGRAM_TOKEN_SANDBOX: ${{ secrets.TELEGRAM_TOKEN_SANDBOX }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python stock_information_MDAX.py
 
       # Step 5: Commit generated charts
       - name: Commit and push charts

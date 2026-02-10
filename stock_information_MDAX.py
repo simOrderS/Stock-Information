@@ -24,15 +24,15 @@ pd.set_option('max_colwidth', None)
 pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:0.2f}'.format
 
-TELEGRAM_TOKEN_DAX = os.getenv("TELEGRAM_TOKEN_DAX")
+TELEGRAM_TOKEN_MDAX = os.getenv("TELEGRAM_TOKEN_MDAX")
 TELEGRAM_TOKEN_SANDBOX = os.getenv("TELEGRAM_TOKEN_SANDBOX")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-DATA_FILE_DAX = "history_DAX40_gettex.csv"
-LIST_DAX = 'liste_DAX40_OnVista.csv'
+DATA_FILE_DAX = "history_MDAX_gettex.csv"
+LIST_DAX = 'liste_MDAX_OnVista.csv'
 
 
 def send_telegram(method_name, text=None, url=None, document=None, filename=None, caption=None):
-    TOKEN = TELEGRAM_TOKEN_DAX
+    TOKEN = TELEGRAM_TOKEN_MDAX
     API_URL = f'https://api.telegram.org/bot{TOKEN}/{method_name}'
 
     keyboard = {
