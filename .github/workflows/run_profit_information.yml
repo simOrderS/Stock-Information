@@ -1,0 +1,41 @@
+name: Weekly Stock Profits Report
+
+on:
+  schedule:
+    - cron: "30 5 * * 6"    # Every Saturday at 05:30 UTC
+  workflow_dispatch:          # Also allows manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  calculate-profits:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repo
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: Run stock profits script
+      - name: Run stock profits script
+        env:
+          TELEGRAM_TOKEN_INDEX: ${{ secrets.TELEGRAM_TOKEN_INDEX }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python scalable_profit_calculator.py --telegram
