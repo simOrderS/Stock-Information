@@ -1,4 +1,4 @@
-name: Stock Profits Report
+name: Generate Stock Profits Report
 
 on:
   schedule:
