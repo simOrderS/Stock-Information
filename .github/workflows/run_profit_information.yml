@@ -1,4 +1,4 @@
-name: Weekly Stock Profits Report
+name: Stock Profits Report
 
 on:
   schedule:
@@ -38,4 +38,4 @@ jobs:
           TELEGRAM_TOKEN_INDEX: ${{ secrets.TELEGRAM_TOKEN_INDEX }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python scalable_profit_calculator.py --telegram
+          python stock_profits.py --telegram
