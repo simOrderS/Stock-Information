@@ -1,8 +1,83 @@
 date;time;status;reference;description;assetType;type;isin;shares;price;amount;fee;tax;currency
-2026-02-20;05:05:43;Pending;"JTSJXI4Y1YKUSWNTSBQHDF";"Scalable Capital Broker 4x Sparplan";Cash;Deposit;;;;1.200,00;0,00;;EUR
-2026-02-19;00:13:16;Pending;"SCALkwT3rcGtfzp";"Western Digital";Security;Sell;US9581021055;0;0,00;0,00;0,00;0,00;EUR
-2026-02-18;08:41:39;Pending;"SCALod7ET1JPFWu";"freenet";Security;Sell;DE000A0Z2ZZ5;0;0,00;0,00;0,00;0,00;EUR
-2026-02-09;17:28:29;Pending;"SCALXAX5M4vxmqm";"Intel Corp";Security;Sell;US4581401001;0;0,00;0,00;0,00;0,00;EUR
+2026-02-27;19:41:04;Executed;"SCALoPf1cSU2tfC";"Amazon.com";Security;Buy;US0231351067;6;176,80;-1.060,80;0,00;0,00;EUR
+2026-02-27;19:08:51;Executed;"SCALR6JekE8cXLe";"Salesforce";Security;Buy;US79466L3024;3;165,70;-497,10;0,00;0,00;EUR
+2026-02-27;17:03:01;Executed;"SCALowehC4EtXYs";"Merck";Security;Sell;DE0006599905;4;128,55;514,20;0,00;0,00;EUR
+2026-02-27;16:49:19;Cancelled;"SCALkPGzPi6EYaa";"Micron Technology";Security;Sell;US5951121038;0;0,00;0,00;0,00;0,00;EUR
+2026-02-27;16:44:11;Executed;"SCALWFSqdwRzZCP";"Invesco Physical Silver";Security;Sell;IE00B43VDT70;7;74,995;524,965;0,00;0,00;EUR
+2026-02-27;16:05:27;Executed;"SCALTqsiQuvbHwr";"Renk Group";Security;Sell;DE000RENK730;8;58,15;465,20;0,00;0,00;EUR
+2026-02-27;14:50:15;Cancelled;"SCALbxe3kPTTf23";"Renk Group";Security;Sell;DE000RENK730;0;0,00;0,00;0,00;0,00;EUR
+2026-02-27;14:47:16;Executed;"SCALG7Jy1aBqhU7";"Münchener Rück";Security;Sell;DE0008430026;1;556,00;556,00;0,00;0,00;EUR
+2026-02-27;11:39:25;Cancelled;"SCALGUqzUfKbviH";"EURO STOXX 50 Long 5x Factor GS";Security;Buy;DE000GK00VS9;0;0,00;0,00;0,00;0,00;EUR
+2026-02-27;07:31:15;Executed;"SCALwQe6j1Uwn6U";"Invesco Physical Platinum";Security;Sell;IE00B40QP990;3;192,26;576,78;0,00;0,00;EUR
+2026-02-27;07:22:59;Cancelled;"SCALnFktVmX7nyG";"Merck";Security;Sell;DE0006599905;0;0,00;0,00;0,00;0,00;EUR
+2026-02-26;22:48:19;Executed;"SCALDCmqdz85ub4";"NVIDIA";Security;Buy;US67066G1040;2;157,06;-314,12;0,00;0,00;EUR
+2026-02-26;18:47:22;Executed;"SCALPwZdWSGrsXA";"Nasdaq";Security;Sell;US6311031081;15;74,22;1.113,30;0,00;0,00;EUR
+2026-02-26;18:46:34;Executed;"SCALRL3ARSBz7oH";"Salesforce";Security;Sell;US79466L3024;3;167,32;501,96;0,00;0,00;EUR
+2026-02-26;17:38:03;Executed;"SCALxE6DFwZpaHr";"SK HYNIX GDR";Security;Buy;US78392B1070;1;652,00;-652,00;0,00;0,00;EUR
+2026-02-26;15:54:48;Executed;"SCALDcYDPt7nLM7";"EURO STOXX 50 Long 5x Factor GS";Security;Sell;DE000GK00VS9;9;57,43;516,87;0,00;0,00;EUR
+2026-02-26;15:53:21;Executed;"SCALS2nGbhhJSWb";"Taiwan Semiconductor Manufact. ADR";Security;Buy;US8740391003;2;318,50;-637,00;0,00;0,00;EUR
+2026-02-26;15:52:56;Executed;"SCALoV15maeTKm4";"iShares Core DAX (Acc)";Security;Sell;DE0005933931;3;209,00;627,00;0,00;0,00;EUR
+2026-02-26;12:52:48;Cancelled;"SCAL8gnMb4vkmKR";"Merck";Security;Sell;DE0006599905;0;0,00;0,00;0,00;0,00;EUR
+2026-02-26;10:04:20;Executed;"SCALPQs5eufk5iw";"SK HYNIX GDR";Security;Buy;US78392B1070;1;682,00;-682,00;0,00;0,00;EUR
+2026-02-26;10:03:19;Executed;"SCALEKmoT44rDDa";"SK HYNIX GDR";Security;Sell;US78392B1070;1;674,00;674,00;0,00;0,00;EUR
+2026-02-26;09:00:22;Executed;"SCAL84sSCZyxx85";"Fresenius";Security;Sell;DE0005785604;9;51,52;463,68;0,00;0,00;EUR
+2026-02-26;08:06:17;Executed;"SCALJZsAw6dEE7b";"Münchener Rück";Security;Buy;DE0008430026;1;556,00;-556,00;0,00;0,00;EUR
+2026-02-26;07:58:17;Executed;"SCAL9CYVdMEnbxA";"SK HYNIX GDR";Security;Buy;US78392B1070;1;668,00;-668,00;0,00;0,00;EUR
+2026-02-25;21:49:24;Executed;"SCALVHsEFKSFTzK";"Invesco Physical Platinum";Security;Buy;IE00B40QP990;3;185,80;-557,40;0,00;0,00;EUR
+2026-02-25;16:33:41;Executed;"SCALNGJCsFoaqVR";"Brenntag Short Factor BNP";Security;Sell;DE000PJ3A5T9;58;8,81;510,98;0,00;0,00;EUR
+2026-02-25;16:03:29;Executed;"SCAL6mMKM8eWv9v";"Oracle";Security;Sell;US68389X1054;4;129,84;519,36;0,00;0,00;EUR
+2026-02-25;15:45:04;Executed;"SCALe5FRXeSk7Z1";"Micron Technology";Security;Sell;US5951121038;2;369,55;739,10;0,00;0,00;EUR
+2026-02-25;15:10:49;Executed;"SCALArR5XoamdeP";"Global X Copper Miners (Acc)";Security;Buy;IE0003Z9E2Y3;7;63,74;-446,18;0,00;0,00;EUR
+2026-02-25;15:07:43;Executed;"SCALG7v66BWsm94";"Porsche Vz";Security;Sell;DE000PAG9113;11;41,67;458,37;0,00;0,00;EUR
+2026-02-25;15:07:34;Cancelled;"SCALHtgyd4dmtW1";"Porsche Vz";Security;Sell;DE000PAG9113;0;0,00;0,00;0,00;0,00;EUR
+2026-02-25;14:00:16;Executed;"SCAL3JFndA5A8B7";"Brenntag Short Factor BNP";Security;Buy;DE000PJ3A5T9;58;8,60;-498,80;0,00;0,00;EUR
+2026-02-25;12:02:33;Executed;"SCAL8EYnfXUpmzQ";"iShares Core S&P 500 (Acc)";Security;Savings plan;IE00B5BMR087;0,477342;628,48;-299,99990016;0,00;0,00;EUR
+2026-02-25;11:56:37;Executed;"SCALxaokD8KSG66";"Xtrackers MSCI World Information Technology (Acc)";Security;Savings plan;IE00BM67HT60;3,090563;97,0696788009;-299,9999577239459;0,00;0,00;EUR
+2026-02-25;11:36:43;Executed;"SCALAiuq86N6p4d";"Invesco Physical Gold A";Security;Savings plan;IE00B579F325;0,70932;422,94;-299,9998008;0,00;0,00;EUR
+2026-02-25;11:24:47;Executed;"SCALi2Y6rQS9UYs";"iShares Nasdaq 100 (Acc)";Security;Savings plan;IE00B53SZB19;0,246264;1.218,20;-299,9988048;0,00;0,00;EUR
+2026-02-25;08:14:59;Executed;"SCALYS9PjmVjq8Q";"Vonovia";Security;Sell;DE000A1ML7J1;18;28,00;504,00;0,00;0,00;EUR
+2026-02-25;08:00:03;Executed;"SCALsyaAMqXufN1";"EURO STOXX 50 Long 5x Factor GS";Security;Buy;DE000GK00VS9;9;56,29;-506,61;0,00;0,00;EUR
+2026-02-24;22:05:11;Executed;"SCALBsMMpbSd3jq";"Salesforce";Security;Buy;US79466L3024;3;155,76;-467,28;0,00;0,00;EUR
+2026-02-24;19:53:15;Executed;"SCAL94d3Q8GrBMN";"Micron Technology";Security;Buy;US5951121038;2;350,65;-701,30;0,00;0,00;EUR
+2026-02-24;19:43:55;Executed;"SCALND1acyRAWg9";"Micron Technology";Security;Buy;US5951121038;2;359,25;-718,50;0,00;0,00;EUR
+2026-02-24;17:11:27;Cancelled;"SCALwhPopgmgRN3";"Porsche Vz";Security;Sell;DE000PAG9113;0;0,00;0,00;0,00;0,00;EUR
+2026-02-24;17:10:30;Executed;"SCALw3mBWgyU5k2";"Micron Technology";Security;Sell;US5951121038;2;365,25;730,50;0,00;0,00;EUR
+2026-02-24;17:09:45;Cancelled;"SCALL7GK7BTQbX3";"Micron Technology";Security;Sell;US5951121038;0;0,00;0,00;0,00;0,00;EUR
+2026-02-24;16:18:25;Executed;"SCALEszYCdHwDoN";"TeamViewer Short 2x Factor GS";Security;Sell;DE000GU3SA96;11;26,45;290,95;0,00;0,00;EUR
+2026-02-24;15:54:41;Executed;"SCALLXK7e2Co5T1";"Salesforce";Security;Sell;US79466L3024;3;157,16;471,48;0,00;0,00;EUR
+2026-02-24;15:46:20;Cancelled;"SCALaphhaANVckM";"TeamViewer Short 2x Factor GS";Security;Sell;DE000GU3SA96;0;0,00;0,00;0,00;0,00;EUR
+2026-02-24;15:33:38;Executed;"SCALBwRBuoi2oUX";"Micron Technology";Security;Buy;US5951121038;2;358,40;-716,80;0,00;0,00;EUR
+2026-02-24;14:13:13;Executed;"SCALbFA1qUEJ43h";"SK HYNIX GDR";Security;Buy;US78392B1070;1;600,00;-600,00;0,00;0,00;EUR
+2026-02-24;13:59:42;Executed;"SCALybAjmDYz3ii";"Taiwan Semiconductor Manufact. ADR";Security;Sell;US8740391003;2;321,50;643,00;0,00;0,00;EUR
+2026-02-24;13:59:30;Cancelled;"SCALzW7ZRMuK27H";"Taiwan Semiconductor Manufact. ADR";Security;Sell;US8740391003;0;0,00;0,00;0,00;0,00;EUR
+2026-02-24;10:59:34;Executed;"SCALprCZ1CJKxJR";"Siemens Energy";Security;Sell;DE000ENER6Y0;3;166,05;498,15;0,00;0,00;EUR
+2026-02-24;10:46:31;Cancelled;"SCALUxnsXBKV5y5";"Siemens Energy";Security;Sell;DE000ENER6Y0;0;0,00;0,00;0,00;0,00;EUR
+2026-02-24;10:46:09;Executed;"SCALnSkM2AA8u8b";"Salesforce";Security;Buy;US79466L3024;3;151,18;-453,54;0,00;0,00;EUR
+2026-02-24;09:05:33;Executed;"SCAL8AzBfHKepM9";"TeamViewer Short 2x Factor GS";Security;Buy;DE000GU3SA96;11;26,56;-292,16;0,00;0,00;EUR
+2026-02-24;08:28:27;Executed;"SCALKGQfLwqbc7r";"MTU Aero Engines";Security;Buy;DE000A0D9PT0;1;394,90;-394,90;0,00;0,00;EUR
+2026-02-24;08:25:02;Executed;"SCAL7TNXYc6UeCT";"iShares Core DAX (Acc)";Security;Buy;DE0005933931;3;206,95;-620,85;0,00;0,00;EUR
+2026-02-24;08:13:26;Executed;"SCAL74NseJY1Sxd";"ASML Holding";Security;Buy;NL0010273215;1;1.264,60;-1.264,60;0,00;0,00;EUR
+2026-02-24;07:45:16;Executed;"SCALgAsweGY8Z2o";"Samsung Electronics GDR";Security;Sell;US7960508882;1;2.920,00;2.920,00;0,00;0,00;EUR
+2026-02-23;21:07:26;Executed;"SCALCu1n9Ax2BjF";"NVIDIA";Security;Buy;US67066G1040;3;161,56;-484,68;0,00;0,00;EUR
+2026-02-23;18:03:18;Executed;"SCALnjr4UtzzZAV";"Invesco Physical Gold A";Security;Sell;IE00B579F325;1;425,00;425,00;0,00;0,00;EUR
+2026-02-23;15:13:16;Executed;"SCAL4PpqnxRzzoM";"freenet";Security;Sell;DE000A0Z2ZZ5;31;31,00;961,00;0,00;0,00;EUR
+2026-02-23;11:35:20;Cancelled;"SCALod7ET1JPFWu";"freenet";Security;Sell;DE000A0Z2ZZ5;0;0,00;0,00;0,00;0,00;EUR
+2026-02-23;11:28:41;Executed;"SCALg6jnzYhnBvk";"Invesco Physical Silver";Security;Buy;IE00B43VDT70;7;70,17;-491,19;0,00;0,00;EUR
+2026-02-23;11:28:22;Executed;"SCALTPeBJTPzW2X";"Kioxia Holdings";Security;Sell;JP3236330001;3;113,00;339,00;0,00;0,00;EUR
+2026-02-23;11:27:25;Cancelled;"SCALTawmhupHRRr";"Siemens Energy";Security;Sell;DE000ENER6Y0;0;0,00;0,00;0,00;0,00;EUR
+2026-02-23;09:04:38;Executed;"SCALqguYx6rWibK";"Kioxia Holdings";Security;Buy;JP3236330001;3;111,00;-333,00;0,00;0,00;EUR
+2026-02-23;08:46:20;Cancelled;"SCAL9QMsVw5JegQ";"DAX Short 3x Factor GS";Security;Buy;DE000GQ6AXT2;0;0,00;0,00;0,00;0,00;EUR
+2026-02-23;07:36:10;Cancelled;"SCALXAX5M4vxmqm";"Intel Corp";Security;Sell;US4581401001;0;0,00;0,00;0,00;0,00;EUR
+2026-02-23;07:36:03;Cancelled;"SCALkwT3rcGtfzp";"Western Digital";Security;Sell;US9581021055;0;0,00;0,00;0,00;0,00;EUR
+2026-02-23;07:34:37;Executed;"SCAL5hbUGBVeYeZ";"Knorr-Bremse";Security;Buy;DE000KBX1006;4;116,10;-464,40;0,00;0,00;EUR
+2026-02-23;07:30:01;Executed;"SCAL9Hv233czHAU";"Invesco Physical Silver";Security;Buy;IE00B43VDT70;7;69,865;-489,055;0,00;0,00;EUR
+2026-02-23;07:11:01;Rejected;"SCALVSLkyavbWUY";"DAX Short 3x Factor GS";Security;Buy;DE000GQ6AXT2;0;0,00;0,00;0,00;0,00;EUR
+2026-02-23;07:10:06;Cancelled;"SCALGq1WbiXF33k";"Microsoft";Security;Buy;US5949181045;0;0,00;0,00;0,00;0,00;EUR
+2026-02-23;01:00:00;Executed;"JTSJXI4Y1YKUSWNTSBQHDF";"Scalable Capital Broker 4x Sparplan";Cash;Deposit;;;;1.200,00;0,00;;EUR
+2026-02-23;01:00:00;Executed;"363229_cns3t2c78AFERemuBBek9Q";"Infineon Technologies";Cash;Distribution;DE0006231004;;;3,50;0,00;0,00;EUR
+2026-02-20;20:59:19;Executed;"SCAL7UF2H3xGtMT";"Samsung Electronics GDR";Security;Buy;US7960508882;1;2.870,00;-2.870,00;0,00;0,00;EUR
+2026-02-20;20:58:29;Executed;"SCALGua8U8cz67A";"WisdomTree Brent Crude Oil USD";Security;Buy;JE00B78CGV99;10;48,074;-480,74;0,00;0,00;EUR
+2026-02-20;20:56:57;Executed;"SCALvr91suvnun1";"Oracle";Security;Buy;US68389X1054;4;125,58;-502,32;0,00;0,00;EUR
 2026-02-20;18:32:08;Executed;"SCALroBdv8dnZ33";"Münchener Rück";Security;Sell;DE0008430026;1;542,00;542,00;0,00;0,00;EUR
 2026-02-20;16:10:14;Executed;"SCALgiC5UkiiXPZ";"Nasdaq 100 Long 5x Factor GS";Security;Sell;DE000GX82HZ4;25;19,593;489,825;0,00;0,00;EUR
 2026-02-20;16:00:45;Executed;"SCALmWcjU9JtCsq";"Micron Technology";Security;Sell;US5951121038;2;360,00;720,00;0,00;0,00;EUR
@@ -247,8 +322,8 @@ date;time;status;reference;description;assetType;type;isin;shares;price;amount;f
 2026-01-02;15:40:48;Executed;"SCALvKU8h9oL7mg";"Microsoft";Security;Buy;US5949181045;2;411,00;-822,00;0,00;0,00;EUR
 2026-01-02;15:40:19;Executed;"SCALeSZKiGmJETK";"ASML Holding Long 3x Factor GS";Security;Buy;DE000GB7ADD3;26;9,728;-252,928;0,00;0,00;EUR
 2026-01-02;14:33:46;Executed;"SCAL4U9jUwmdgeR";"DAX Long 5x Factor GS";Security;Buy;DE000GH1L183;48;5,332;-255,936;0,00;0,00;EUR
-2026-01-01;01:00:00;Executed;"9IRJC4POJFEWCCL0";"Entgelt PRIME+ Broker";Cash;Fee;;;;-4,99;0,00;;EUR
 2026-01-01;01:00:00;Executed;"4c4b6a9e-4103-483d-ab22-3f42e6c8a43b";;Cash;Interest;;;;98,53;0,00;8,70;EUR
+2026-01-01;01:00:00;Executed;"9IRJC4POJFEWCCL0";"Entgelt PRIME+ Broker";Cash;Fee;;;;-4,99;0,00;;EUR
 2025-12-30;11:53:24;Executed;"SCALKkh3zFjwDAi";"Apple";Security;Buy;US0378331005;3;232,00;-696,00;0,00;0,00;EUR
 2025-12-30;10:38:59;Cancelled;"SCALeyjjsbAqHbJ";"Apple";Security;Buy;US0378331005;0;0,00;0,00;0,00;0,00;EUR
 2025-12-30;10:37:25;Cancelled;"SCALEuJ5usHPy4o";"thyssenkrupp";Security;Buy;DE0007500001;0;0,00;0,00;0,00;0,00;EUR
@@ -303,42 +378,42 @@ date;time;status;reference;description;assetType;type;isin;shares;price;amount;f
 2025-12-08;01:00:00;Executed;"CDS_DTA_otnCmDq1XgzVoNy3y1Wztb_0_5k6T7JXSPk1B2ifRu2ok3x";"";Cash;Taxes;;;;195,23;0,00;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-DE0007030009-WDP";"Rheinmetall";Security;Security transfer;DE0007030009;1;1.532,00;1.532,00;;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-US02079K3059-WDP";"Alphabet A";Security;Security transfer;US02079K3059;3;274,95;824,85;;;EUR
-2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-US0378331005-WDP";"Apple";Security;Security transfer;US0378331005;3;240,00;720,00;;;EUR
-2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-NL0010273215-WDP";"ASML Holding";Security;Security transfer;NL0010273215;1;943,90;943,90;;;EUR
-2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-US33813J1060-WDP";"Fisker A";Security;Security transfer;US33813J1060;650;0,00;0,00;;;EUR
-2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-IE00B4L5Y983-WDP";"iShares Core MSCI World (Acc)";Security;Security transfer;IE00B4L5Y983;51,9;111,72;5.798,268;;;EUR
-2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-IE00B53SZB19-WDP";"iShares Nasdaq 100 (Acc)";Security;Security transfer;IE00B53SZB19;4,026;1.266,00;5.096,916;;;EUR
-2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-DE0007164600-WDP";"SAP SE";Security;Security transfer;DE0007164600;2;212,75;425,50;;;EUR
-2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-DE0007500001-WDP";"thyssenkrupp";Security;Security transfer;DE0007500001;40;9,40;376,00;;;EUR
-2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-US67066G1040-WDP";"NVIDIA";Security;Security transfer;US67066G1040;4;156,72;626,88;;;EUR
-2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-GB00BLD4ZL17-WDP";"CoinShares Physical Bitcoin";Security;Security transfer;GB00BLD4ZL17;10;74,01;740,10;;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-US5949181045-WDP";"Microsoft";Security;Security transfer;US5949181045;2;414,55;829,10;;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-IE00BHZRQZ17-WDP";"Franklin FTSE India (Acc)";Security;Security transfer;IE00BHZRQZ17;67,345;38,415;2.587,058175;;;EUR
+2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-GB00BLD4ZL17-WDP";"CoinShares Physical Bitcoin";Security;Security transfer;GB00BLD4ZL17;10;74,01;740,10;;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-EUR-DEPOSIT";"";Cash;Deposit;;;;3.543,91;0,00;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-IE00B579F325-WDP";"Invesco Physical Gold A";Security;Security transfer;IE00B579F325;6,782;348,10;2.360,8142;;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-IE00B5BMR087-WDP";"iShares Core S&P 500 (Acc)";Security;Security transfer;IE00B5BMR087;8,71;631,46;5.500,0166;;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-DE000TKMS001-WDP";"Tkms Ag & Co. Kgaa";Security;Security transfer;DE000TKMS001;2;68,65;137,30;;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-DE000ZAL1111-WDP";"Zalando";Security;Security transfer;DE000ZAL1111;15;23,82;357,30;;;EUR
 2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-IE00BM67HT60-WDP";"Xtrackers MSCI World Information Technology (Acc)";Security;Security transfer;IE00BM67HT60;51,728;102,28;5.290,73984;;;EUR
+2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-US33813J1060-WDP";"Fisker A";Security;Security transfer;US33813J1060;650;0,00;0,00;;;EUR
+2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-IE00B4L5Y983-WDP";"iShares Core MSCI World (Acc)";Security;Security transfer;IE00B4L5Y983;51,9;111,72;5.798,268;;;EUR
+2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-IE00B53SZB19-WDP";"iShares Nasdaq 100 (Acc)";Security;Security transfer;IE00B53SZB19;4,026;1.266,00;5.096,916;;;EUR
+2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-DE0007164600-WDP";"SAP SE";Security;Security transfer;DE0007164600;2;212,75;425,50;;;EUR
+2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-DE0007500001-WDP";"thyssenkrupp";Security;Security transfer;DE0007500001;40;9,40;376,00;;;EUR
+2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-US67066G1040-WDP";"NVIDIA";Security;Security transfer;US67066G1040;4;156,72;626,88;;;EUR
+2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-US0378331005-WDP";"Apple";Security;Security transfer;US0378331005;3;240,00;720,00;;;EUR
+2025-12-06;01:00:00;Executed;"SWITCH-101-cns3t2c78AFERemuBBek9Q-NL0010273215-WDP";"ASML Holding";Security;Security transfer;NL0010273215;1;943,90;943,90;;;EUR
 2025-12-05;01:00:00;Executed;"WWUM 00594586036";"Invesco Physical Gold A";Security;Security transfer;IE00B579F325;-6,782;348,16;-2.361,22112;;;EUR
 2025-12-05;01:00:00;Executed;"WWUM 00594586351";"Franklin FTSE India (Acc)";Security;Security transfer;IE00BHZRQZ17;-67,345;38,43;-2.588,06835;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594585295";"thyssenkrupp";Security;Security transfer;DE0007500001;-40;9,206;-368,24;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594586994";"Fisker A";Security;Security transfer;US33813J1060;-650;0,00064421;-0,4187365;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594587148";"NVIDIA";Security;Security transfer;US67066G1040;-4;156,76;-627,04;;;EUR
+2025-12-05;01:00:00;Executed;"52025004";"KKT-Abschluss";Cash;Interest;;;;5,36;0,00;0,00;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594585110";"Rheinmetall";Security;Security transfer;DE0007030009;-1;1.540,00;-1.540,00;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594585205";"SAP SE";Security;Security transfer;DE0007164600;-2;210,15;-420,30;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594586707";"ASML Holding";Security;Security transfer;NL0010273215;-1;952,20;-952,20;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594586871";"Apple";Security;Security transfer;US0378331005;-3;240,75;-722,25;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594585571";"CoinShares Physical Bitcoin";Security;Security transfer;GB00BLD4ZL17;-10;76,50;-765,00;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594585651";"iShares Core MSCI World (Acc)";Security;Security transfer;IE00B4L5Y983;-51,9;111,34;-5.778,546;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594586792";"Alphabet A";Security;Security transfer;US02079K3059;-3;271,50;-814,50;;;EUR
+2025-12-05;01:00:00;Executed;"WWUM 00594586168";"iShares Core S&P 500 (Acc)";Security;Security transfer;IE00B5BMR087;-8,71;628,92;-5.477,8932;;;EUR
 2025-12-05;01:00:00;Executed;"WWUM 00594585404";"Tkms Ag & Co. Kgaa";Security;Security transfer;DE000TKMS001;-2;67,00;-134,00;;;EUR
 2025-12-05;01:00:00;Executed;"WWUM 00594585484";"Zalando";Security;Security transfer;DE000ZAL1111;-15;23,58;-353,70;;;EUR
 2025-12-05;01:00:00;Executed;"WWUM 00594585862";"iShares Nasdaq 100 (Acc)";Security;Security transfer;IE00B53SZB19;-4,026;1.256,60;-5.059,0716;;;EUR
 2025-12-05;01:00:00;Executed;"WWUM 00594586528";"Xtrackers MSCI World Information Technology (Acc)";Security;Security transfer;IE00BM67HT60;-51,728;101,66;-5.258,66848;;;EUR
 2025-12-05;01:00:00;Executed;"WWUM 00594587073";"Microsoft";Security;Security transfer;US5949181045;-2;410,30;-820,60;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594585571";"CoinShares Physical Bitcoin";Security;Security transfer;GB00BLD4ZL17;-10;76,50;-765,00;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594585651";"iShares Core MSCI World (Acc)";Security;Security transfer;IE00B4L5Y983;-51,9;111,34;-5.778,546;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594586792";"Alphabet A";Security;Security transfer;US02079K3059;-3;271,50;-814,50;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594586168";"iShares Core S&P 500 (Acc)";Security;Security transfer;IE00B5BMR087;-8,71;628,92;-5.477,8932;;;EUR
-2025-12-05;01:00:00;Executed;"52025004";"KKT-Abschluss";Cash;Interest;;;;5,36;0,00;0,00;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594585110";"Rheinmetall";Security;Security transfer;DE0007030009;-1;1.540,00;-1.540,00;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594585295";"thyssenkrupp";Security;Security transfer;DE0007500001;-40;9,206;-368,24;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594586994";"Fisker A";Security;Security transfer;US33813J1060;-650;0,00064421;-0,4187365;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594587148";"NVIDIA";Security;Security transfer;US67066G1040;-4;156,76;-627,04;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594585205";"SAP SE";Security;Security transfer;DE0007164600;-2;210,15;-420,30;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594586707";"ASML Holding";Security;Security transfer;NL0010273215;-1;952,20;-952,20;;;EUR
-2025-12-05;01:00:00;Executed;"WWUM 00594586871";"Apple";Security;Security transfer;US0378331005;-3;240,75;-722,25;;;EUR
 2025-12-01;01:00:00;Executed;"U2AZWIFVHFPG21VC";"Entgelt PRIME+ Broker";Cash;Fee;;;;-4,99;0,00;;EUR
 2025-11-25;11:44:17;Executed;"SCALo5rBMG5Gpxe";"iShares Core S&P 500 (Acc)";Security;Savings plan;IE00B5BMR087;0,48278;621,40;-299,999492;0,00;0,00;EUR
 2025-11-25;11:33:03;Executed;"SCALkgYb4GjBi98";"Invesco Physical Gold A";Security;Savings plan;IE00B579F325;0,580484;344,54;-199,99995736;0,00;0,00;EUR
@@ -403,8 +478,8 @@ date;time;status;reference;description;assetType;type;isin;shares;price;amount;f
 2025-07-07;18:14:40;Executed;"SCALbewYXnUUdSD";"Rheinmetall";Security;Buy;DE0007030009;1;1.794,00;-1.794,00;0,00;0,00;EUR
 2025-07-04;02:00:00;Executed;"WWEK 48775217";"NVIDIA";Cash;Distribution;US67066G1040;;;0,01;0,00;0,02;EUR
 2025-07-01;02:00:00;Executed;"8cd3688e-99fc-437e-897f-b6b188c42faa";;Cash;Interest;;;;249,06;0,00;89,22;EUR
-2025-06-30;02:00:00;Executed;"52025002";"KKT-Abschluss";Cash;Interest;;;;12,28;0,00;0,00;EUR
 2025-06-30;02:00:00;Executed;"SABWQK1ZI6WAVSXE";"Entgelt PRIME+ Broker";Cash;Fee;;;;-4,99;0,00;;EUR
+2025-06-30;02:00:00;Executed;"52025002";"KKT-Abschluss";Cash;Interest;;;;12,28;0,00;0,00;EUR
 2025-06-25;15:31:32;Executed;"SCALGXffyxWi1eH";"iShares Nasdaq 100 (Acc)";Security;Savings plan;IE00B53SZB19;0,272;1.101,80;-299,6896;0,00;0,00;EUR
 2025-06-25;15:17:54;Executed;"SCAL2bnWoRhRDQj";"Invesco Physical Gold A";Security;Savings plan;IE00B579F325;0,725;275,60;-199,81;0,00;0,00;EUR
 2025-06-25;14:49:41;Executed;"SCALic4fHri2x7U";"Xtrackers MSCI World Information Technology (Acc)";Security;Savings plan;IE00BM67HT60;3,452;86,90;-299,9788;0,00;0,00;EUR
@@ -438,8 +513,8 @@ date;time;status;reference;description;assetType;type;isin;shares;price;amount;f
 2025-04-11;02:00:00;Executed;"ICWNQLRTSMM81RVUFC79CF";"Scalable Capital Broker 2x Sparplan";Cash;Deposit;;;;500,00;0,00;;EUR
 2025-04-03;02:00:00;Executed;"WWEK 43961542";"NVIDIA";Cash;Distribution;US67066G1040;;;0,02;0,00;0,02;EUR
 2025-04-01;02:00:00;Executed;"0a86cbbb-9d31-4701-9d2e-22560d64df09";;Cash;Interest;;;;172,00;0,00;61,62;EUR
-2025-03-31;02:00:00;Executed;"52025001";"KKT-Abschluss";Cash;Interest;;;;110,65;0,00;0,00;EUR
 2025-03-31;02:00:00;Executed;"XSWFHXCXE3ECYE25";"Entgelt PRIME+ Broker";Cash;Fee;;;;-4,99;0,00;;EUR
+2025-03-31;02:00:00;Executed;"52025001";"KKT-Abschluss";Cash;Interest;;;;110,65;0,00;0,00;EUR
 2025-03-25;11:49:41;Executed;"SCALzwou4Qxsjvf";"Invesco Physical Gold A";Security;Savings plan;IE00B579F325;0,742;269,46;-199,93932;0,00;0,00;EUR
 2025-03-25;11:46:16;Executed;"SCALg3MRTWazhjB";"iShares Core S&P 500 (Acc)";Security;Savings plan;IE00B5BMR087;0,529;567,10;-299,9959;0,00;0,00;EUR
 2025-03-25;11:38:42;Executed;"SCALCG9DtKXZmEm";"Xtrackers MSCI World Information Technology (Acc)";Security;Savings plan;IE00BM67HT60;3,654;82,08;-299,92032;0,00;0,00;EUR
@@ -463,14 +538,14 @@ date;time;status;reference;description;assetType;type;isin;shares;price;amount;f
 2025-02-13;11:43:11;Executed;"SCALoBcc5vELYVK";"Franklin FTSE India (Acc)";Security;Savings plan;IE00BHZRQZ17;5,057;39,545;-199,979;0,00;0,00;EUR
 2025-02-12;01:00:00;Executed;"GW7HHJ66EBJRDKAFTKHNAS";"Scalable Capital Broker 2x Sparplan";Cash;Deposit;;;;500,00;0,00;;EUR
 2025-02-10;01:00:00;Executed;"kGvXFPoZTGrA4HsdQxsFTt";"Scalable Capital";Cash;Deposit;;;;10.000,00;0,00;;EUR
-2025-02-07;01:00:00;Executed;"j8r6Tisww2FD6pi3t6amEi";"Scalable Capital";Cash;Deposit;;;;10.000,00;0,00;;EUR
 2025-02-07;01:00:00;Executed;"5WekHEBCXZHTAydVbcvjmq";"Scalable Capital";Cash;Deposit;;;;10.000,00;0,00;;EUR
-2025-02-06;01:00:00;Executed;"dvsazxZbJJhMo3ND31br6i";"Scalable Capital";Cash;Deposit;;;;10.000,00;0,00;;EUR
+2025-02-07;01:00:00;Executed;"j8r6Tisww2FD6pi3t6amEi";"Scalable Capital";Cash;Deposit;;;;10.000,00;0,00;;EUR
 2025-02-06;01:00:00;Executed;"iqWHYK2DzLLAApeQumAVQs";"Scalable Capital";Cash;Deposit;;;;10.000,00;0,00;;EUR
+2025-02-06;01:00:00;Executed;"dvsazxZbJJhMo3ND31br6i";"Scalable Capital";Cash;Deposit;;;;10.000,00;0,00;;EUR
 2025-02-05;01:00:00;Executed;"WWEK 41037474";"thyssenkrupp";Cash;Distribution;DE0007500001;;;6,00;0,00;0,00;EUR
+2025-02-03;01:00:00;Executed;"VMLLD7EDXF1ZTSWWSNPEGC";"Scalable Capital Broker Auszahlung";Cash;Withdrawal;;;;-40.000,00;0,00;;EUR
 2025-02-03;01:00:00;Executed;"GT3TAGYFCHCJDPZB";"Entgelt PRIME+ Broker";Cash;Fee;;;;-4,99;0,00;;EUR
 2025-02-03;01:00:00;Executed;"6CFS87eXfMT1qSGvsJAgs6";"Scalable Capital Broker";Cash;Deposit;;;;10.000,00;0,00;;EUR
-2025-02-03;01:00:00;Executed;"VMLLD7EDXF1ZTSWWSNPEGC";"Scalable Capital Broker Auszahlung";Cash;Withdrawal;;;;-40.000,00;0,00;;EUR
 2025-01-27;15:51:58;Executed;"SCAL6sP9JEqYiZu";"iShares Core S&P 500 (Acc)";Security;Savings plan;IE00B5BMR087;0,495;605,68;-299,8116;0,00;0,00;EUR
 2025-01-27;15:49:12;Executed;"SCALMkyionhQBaN";"iShares Nasdaq 100 (Acc)";Security;Savings plan;IE00B53SZB19;0,26;1.153,00;-299,7799;0,00;0,00;EUR
 2025-01-27;15:13:40;Executed;"SCAL1GLjpK8ZQ9z";"Invesco Physical Gold A";Security;Savings plan;IE00B579F325;0,792;252,50;-199,98;0,00;0,00;EUR
@@ -520,8 +595,8 @@ date;time;status;reference;description;assetType;type;isin;shares;price;amount;f
 2024-11-11;15:30:08;Executed;"SCALSi8mb7xq5r4";"Starbucks";Security;Sell;US8552441094;3;92,14;276,42;0,00;0,00;EUR
 2024-11-07;01:00:00;Executed;"WWEK 34233050";"ASML Holding";Cash;Distribution;NL0010273215;;;1,29;0,00;0,23;EUR
 2024-11-04;01:00:00;Executed;"VSX72CT0JVVZC9DQ";"Entgelt PRIME+ Broker";Cash;Fee;;;;-4,99;0,00;;EUR
-2024-10-29;01:00:00;Executed;"CANCEL-WWEK 25714438";"Qualcomm";Cash;Distribution;US7475251036;;;-1,55;0,00;-0,66;EUR
 2024-10-29;01:00:00;Executed;"WWEK 34048528";"Qualcomm";Cash;Distribution;US7475251036;;;1,55;0,00;0,66;EUR
+2024-10-29;01:00:00;Executed;"CANCEL-WWEK 25714438";"Qualcomm";Cash;Distribution;US7475251036;;;-1,55;0,00;-0,66;EUR
 2024-10-25;14:11:58;Executed;"SCALNEzCQ2yPnCt";"iShares Core S&P 500 (Acc)";Security;Savings plan;IE00B5BMR087;0,525;570,38;-299,4495;0,00;0,00;EUR
 2024-10-25;14:03:58;Executed;"SCALc1njQbMmsuk";"Xtrackers MSCI World Information Technology (Acc)";Security;Savings plan;IE00BM67HT60;3,494;85,84;-299,9249;0,00;0,00;EUR
 2024-10-25;13:58:14;Executed;"SCALnHMGwWkuXML";"iShares Nasdaq 100 (Acc)";Security;Savings plan;IE00B53SZB19;0,28;1.071,40;-299,992;0,00;0,00;EUR

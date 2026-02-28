@@ -34,12 +34,12 @@ from collections import defaultdict
 DEFAULT_LOOKBACK_DAYS = 7          # How many days back to look for sells
 CSV_DELIMITER         = ";"        # Column delimiter in the CSV
 DATE_FORMAT           = "%Y-%m-%d" # Date format in the CSV
-FILE_PATTERN          = "Scalable/*_ScalableCapital-Broker-Transactions.csv"
+FILE_PATTERN          = "Scalable/*.csv"
 
 # ── Telegram credentials ──────────────────────────────────────────────────────
 #    Set these as environment variables, or replace the fallback strings below.
 TELEGRAM_TOKEN_INDEX = os.environ.get("TELEGRAM_TOKEN_INDEX", "")
-TELEGRAM_CHAT_ID   = os.environ.get("TELEGRAM_CHAT_ID",   "")
+TELEGRAM_CHAT_ID     = os.environ.get("TELEGRAM_CHAT_ID",     "")
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -81,112 +81,119 @@ def load_transactions(filepath: str) -> list[dict]:
     return transactions
 
 
-def get_recent_sells(transactions: list[dict], lookback_days: int) -> list[dict]:
-    """Return executed Security Sell transactions within the lookback window."""
-    cutoff = datetime.now() - timedelta(days=lookback_days)
-    sells = []
-    for t in transactions:
-        if (
-            t.get("status") == "Executed"
-            and t.get("type") == "Sell"
-            and t.get("assetType") == "Security"
-        ):
-            dt = parse_datetime(t["date"], t["time"])
-            if dt >= cutoff:
-                sells.append(t)
-    sells.sort(key=lambda x: parse_datetime(x["date"], x["time"]), reverse=True)
-    return sells
-
-
-def find_matching_buy(sell: dict, transactions: list[dict]) -> dict | None:
-    """
-    Find the most recent executed Buy for the same asset that occurred
-    BEFORE the sell transaction (LIFO matching).
-    """
-    sell_dt   = parse_datetime(sell["date"], sell["time"])
-    sell_isin = sell.get("isin", "").strip()
-    sell_desc = sell.get("description", "").strip()
-
-    candidates = []
-    for t in transactions:
-        if (
-            t.get("status") == "Executed"
-            and t.get("type") == "Buy"
-            and t.get("assetType") == "Security"
-        ):
-            isin_match = sell_isin and t.get("isin", "").strip() == sell_isin
-            desc_match = not sell_isin and t.get("description", "").strip() == sell_desc
-
-            if isin_match or desc_match:
-                buy_dt = parse_datetime(t["date"], t["time"])
-                if buy_dt < sell_dt:
-                    candidates.append((buy_dt, t))
-
-    if not candidates:
-        return None
-
-    candidates.sort(key=lambda x: x[0], reverse=True)
-    return candidates[0][1]
-
-
 def calculate_profits(transactions: list[dict], lookback_days: int) -> list[dict]:
     """
-    For each recent sell, find the matching buy and compute the profit.
-    Returns a list of result dicts.
+    For each recent sell, compute realized profit using FIFO lot matching.
+    Buy lots are consumed in chronological order (oldest first), supporting
+    partial consumption across multiple buy orders.
+    Returns a list of result dicts, one per sell within the lookback window.
     """
-    sells   = get_recent_sells(transactions, lookback_days)
+    cutoff = datetime.now() - timedelta(days=lookback_days)
+
+    # ── 1. Sort all transactions chronologically ───────────────────────────
+    all_sorted = sorted(
+        transactions,
+        key=lambda x: parse_datetime(x["date"], x["time"])
+    )
+
+    # ── 2. Build FIFO lot queues ───────────────────────────────────────────
+    buy_lots = defaultdict(list)
+    for t in all_sorted:
+        if t.get("status") != "Executed" or t.get("assetType") != "Security":
+            continue
+        key = t.get("isin", "").strip() or t.get("description", "").strip()
+        if t.get("type") == "Buy":
+            shares = parse_amount(t.get("shares", "0"))
+            price  = parse_amount(t.get("price",  "0"))
+            if shares > 0:
+                buy_lots[key].append({
+                    "shares"   : shares,
+                    "price"    : price,
+                    "date"     : parse_datetime(t["date"], t["time"]),
+                    "original" : shares,
+                })
+
+    # ── 3. Match each sell against the FIFO queue ──────────────────────────
     results = []
 
-    for sell in sells:
-        sell_amount = parse_amount(sell.get("amount", "0"))
-        sell_shares = parse_amount(sell.get("shares", "0"))
-        sell_price  = parse_amount(sell.get("price", "0"))
-        sell_dt     = parse_datetime(sell["date"], sell["time"])
+    for t in all_sorted:
+        if t.get("status") != "Executed" or t.get("assetType") != "Security":
+            continue
+        if t.get("type") != "Sell":
+            continue
 
-        buy = find_matching_buy(sell, transactions)
+        sell_dt     = parse_datetime(t["date"], t["time"])
+        sell_shares = parse_amount(t.get("shares", "0"))
+        sell_price  = parse_amount(t.get("price",  "0"))
+        sell_amount = parse_amount(t.get("amount", "0"))
+        currency    = t.get("currency", "EUR")
+        key         = t.get("isin", "").strip() or t.get("description", "").strip()
 
-        if buy:
-            buy_shares = parse_amount(buy.get("shares", "0"))
-            buy_price  = parse_amount(buy.get("price", "0"))
-            buy_amount = abs(parse_amount(buy.get("amount", "0")))
-            buy_dt     = parse_datetime(buy["date"], buy["time"])
+        # ── Consume lots FIFO ──────────────────────────────────────────────
+        remaining  = sell_shares
+        cost_basis = 0.0
+        lots_used  = []
 
-            if sell_shares > 0 and buy_shares > 0:
-                cost_basis = buy_price * sell_shares
-            else:
-                cost_basis = buy_amount
+        for lot in buy_lots[key]:          # already in chronological order
+            if remaining <= 0:
+                break
+            consumed = min(lot["shares"], remaining)
+            cost_basis += consumed * lot["price"]
+            lots_used.append({
+                "date"     : lot["date"],
+                "price"    : lot["price"],
+                "consumed" : consumed,
+            })
+            lot["shares"] -= consumed
+            remaining     -= consumed
 
+        # Remove fully exhausted lots
+        buy_lots[key] = [l for l in buy_lots[key] if l["shares"] > 0]
+
+        matched = (remaining == 0)   # False if history didn't cover all shares
+
+        # ── Only include sells within the lookback window in the report ────
+        if sell_dt < cutoff:
+            continue
+
+        if matched:
             profit = sell_amount - cost_basis
 
+            # Build a compact summary of which lots were used
+            buy_date_summary = ", ".join(
+                f"{l['consumed']:.4g} @ {l['price']:.4f} ({l['date'].strftime('%Y-%m-%d')})"
+                for l in lots_used
+            )
+
             results.append({
-                "description" : sell.get("description"),
-                "isin"        : sell.get("isin"),
+                "description" : t.get("description"),
+                "isin"        : t.get("isin"),
                 "sell_date"   : sell_dt.strftime("%Y-%m-%d %H:%M"),
                 "sell_shares" : sell_shares,
                 "sell_price"  : sell_price,
                 "sell_amount" : sell_amount,
-                "buy_date"    : buy_dt.strftime("%Y-%m-%d %H:%M"),
-                "buy_shares"  : buy_shares,
-                "buy_price"   : buy_price,
+                "buy_date"    : buy_date_summary,
+                "buy_shares"  : sum(l["consumed"] for l in lots_used),
+                "buy_price"   : cost_basis / sell_shares if sell_shares else 0,  # weighted avg
                 "cost_basis"  : round(cost_basis, 4),
                 "profit"      : round(profit, 4),
-                "currency"    : sell.get("currency", "EUR"),
+                "currency"    : currency,
                 "matched"     : True,
             })
         else:
             results.append({
-                "description" : sell.get("description"),
-                "isin"        : sell.get("isin"),
+                "description" : t.get("description"),
+                "isin"        : t.get("isin"),
                 "sell_date"   : sell_dt.strftime("%Y-%m-%d %H:%M"),
                 "sell_shares" : sell_shares,
                 "sell_price"  : sell_price,
                 "sell_amount" : sell_amount,
-                "buy_date"    : "N/A",
+                "buy_date"    : "N/A (incomplete buy history)",
                 "buy_shares"  : None,
                 "buy_price"   : None,
                 "cost_basis"  : None,
                 "profit"      : None,
-                "currency"    : sell.get("currency", "EUR"),
+                "currency"    : currency,
                 "matched"     : False,
             })
 
@@ -377,12 +384,11 @@ def main():
     print_report(results, args.days, csv_file)
 
     # ── Send Telegram summary ───────────────────────────────────────────────
-    print(args.telegram)
     if args.telegram:
         # Validate credentials before attempting to send
         missing = []
         if not TELEGRAM_TOKEN_INDEX: missing.append("TELEGRAM_TOKEN_INDEX")
-        if not TELEGRAM_CHAT_ID:   missing.append("TELEGRAM_CHAT_ID")
+        if not TELEGRAM_CHAT_ID:     missing.append("TELEGRAM_CHAT_ID")
         if missing:
             print(f"ERROR: Telegram not configured -- missing env var(s): {', '.join(missing)}", file=sys.stderr)
             print("Set them with: export TELEGRAM_TOKEN_INDEX=... && export TELEGRAM_CHAT_ID=...", file=sys.stderr)
