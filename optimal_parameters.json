@@ -2,123 +2,123 @@
   "DAX": {
     "ticker": "DAX",
     "optimal_params": {
-      "atr_period": 14,
-      "multiplier": 2.75,
+      "atr_period": 21,
+      "multiplier": 3.5,
       "ema_period": 200
     },
     "performance": {
-      "atr_period": 14,
-      "multiplier": 2.75,
-      "total_return": 200.1,
-      "num_trades": 19,
-      "win_rate": 0.526,
-      "sharpe": 0.77,
-      "max_drawdown": -21.0,
-      "score": 41.08
+      "atr_period": 21,
+      "multiplier": 3.5,
+      "total_return": 223.82,
+      "num_trades": 11,
+      "win_rate": 0.545,
+      "sharpe": 0.66,
+      "max_drawdown": -27.71,
+      "score": 36.54
     },
     "market_regime": {
       "regime": "ranging",
-      "volatility": 10.9,
-      "trend_strength": 0.528
+      "volatility": 15.0,
+      "trend_strength": 0.06
     },
     "top_3_alternatives": [
       {
+        "atr_period": 21,
+        "multiplier": 3.5,
+        "total_return": 223.82,
+        "num_trades": 11,
+        "win_rate": 0.545,
+        "sharpe": 0.66,
+        "max_drawdown": -27.71,
+        "score": 36.54
+      },
+      {
         "atr_period": 14,
         "multiplier": 2.75,
-        "total_return": 200.1,
+        "total_return": 156.53,
         "num_trades": 19,
         "win_rate": 0.526,
-        "sharpe": 0.77,
-        "max_drawdown": -21.0,
-        "score": 41.08
+        "sharpe": 0.69,
+        "max_drawdown": -32.67,
+        "score": 33.98
       },
       {
         "atr_period": 16,
         "multiplier": 2.75,
-        "total_return": 191.92,
+        "total_return": 149.53,
         "num_trades": 19,
         "win_rate": 0.526,
-        "sharpe": 0.77,
-        "max_drawdown": -21.0,
-        "score": 40.99
-      },
-      {
-        "atr_period": 12,
-        "multiplier": 2.75,
-        "total_return": 166.42,
-        "num_trades": 19,
-        "win_rate": 0.526,
-        "sharpe": 0.76,
-        "max_drawdown": -21.0,
-        "score": 40.78
+        "sharpe": 0.68,
+        "max_drawdown": -32.67,
+        "score": 33.83
       }
     ],
-    "optimization_date": "2026-02-28T20:11:03.490639",
+    "optimization_date": "2026-03-08T19:31:24.537420",
     "data_range": {
-      "start": "2021-03-02",
-      "end": "2026-02-27",
-      "days": 1274
+      "start": "2021-03-10",
+      "end": "2026-03-06",
+      "days": 1273
     }
   },
   "MDAX": {
     "ticker": "MDAX",
     "optimal_params": {
-      "atr_period": 10,
-      "multiplier": 2.75,
+      "atr_period": 21,
+      "multiplier": 3.5,
       "ema_period": 200
     },
     "performance": {
-      "atr_period": 10,
-      "multiplier": 2.75,
-      "total_return": -25.27,
-      "num_trades": 20,
-      "win_rate": 0.3,
-      "sharpe": -0.0,
-      "max_drawdown": -61.3,
-      "score": -38.67
+      "atr_period": 21,
+      "multiplier": 3.5,
+      "total_return": -36.55,
+      "num_trades": 17,
+      "win_rate": 0.353,
+      "sharpe": -0.12,
+      "max_drawdown": -56.95,
+      "score": -41.9
     },
     "market_regime": {
       "regime": "ranging",
-      "volatility": 13.1,
-      "trend_strength": 0.523
+      "volatility": 16.7,
+      "trend_strength": 0.081
     },
     "top_3_alternatives": [
       {
-        "atr_period": 10,
-        "multiplier": 2.75,
-        "total_return": -25.27,
-        "num_trades": 20,
-        "win_rate": 0.3,
-        "sharpe": -0.0,
-        "max_drawdown": -61.3,
-        "score": -38.67
+        "atr_period": 21,
+        "multiplier": 3.5,
+        "total_return": -36.55,
+        "num_trades": 17,
+        "win_rate": 0.353,
+        "sharpe": -0.12,
+        "max_drawdown": -56.95,
+        "score": -41.9
       },
       {
-        "atr_period": 10,
-        "multiplier": 2.5,
-        "total_return": -23.24,
-        "num_trades": 23,
-        "win_rate": 0.217,
-        "sharpe": 0.04,
-        "max_drawdown": -66.04,
-        "score": -41.12
+        "atr_period": 18,
+        "multiplier": 3.5,
+        "total_return": -42.72,
+        "num_trades": 17,
+        "win_rate": 0.353,
+        "sharpe": -0.17,
+        "max_drawdown": -60.26,
+        "score": -46.47
       },
       {
         "atr_period": 12,
         "multiplier": 2.5,
-        "total_return": -23.61,
-        "num_trades": 23,
-        "win_rate": 0.217,
-        "sharpe": 0.04,
+        "total_return": -34.02,
+        "num_trades": 24,
+        "win_rate": 0.208,
+        "sharpe": -0.04,
         "max_drawdown": -66.57,
-        "score": -41.56
+        "score": -47.41
       }
     ],
-    "optimization_date": "2026-02-28T20:11:06.539830",
+    "optimization_date": "2026-03-08T19:31:27.635068",
     "data_range": {
-      "start": "2021-03-02",
-      "end": "2026-02-27",
-      "days": 1274
+      "start": "2021-03-10",
+      "end": "2026-03-06",
+      "days": 1273
     }
   },
   "SDAX": {
@@ -140,8 +140,8 @@
     },
     "market_regime": {
       "regime": "ranging",
-      "volatility": 15.4,
-      "trend_strength": 0.608
+      "volatility": 19.3,
+      "trend_strength": 0.287
     },
     "top_3_alternatives": [
       {
@@ -162,24 +162,24 @@
         "win_rate": 0.348,
         "sharpe": 0.4,
         "max_drawdown": -39.97,
-        "score": 15.72
+        "score": 15.73
       },
       {
-        "atr_period": 21,
-        "multiplier": 3.0,
-        "total_return": 57.95,
-        "num_trades": 21,
-        "win_rate": 0.333,
-        "sharpe": 0.41,
-        "max_drawdown": -47.93,
-        "score": 13.43
+        "atr_period": 12,
+        "multiplier": 2.75,
+        "total_return": 42.63,
+        "num_trades": 22,
+        "win_rate": 0.364,
+        "sharpe": 0.37,
+        "max_drawdown": -41.83,
+        "score": 12.68
       }
     ],
-    "optimization_date": "2026-02-28T20:11:09.583887",
+    "optimization_date": "2026-03-08T19:31:30.717527",
     "data_range": {
-      "start": "2021-03-02",
-      "end": "2026-02-27",
-      "days": 1274
+      "start": "2021-03-10",
+      "end": "2026-03-06",
+      "days": 1273
     }
   },
   "TecDAX": {
@@ -201,8 +201,8 @@
     },
     "market_regime": {
       "regime": "ranging",
-      "volatility": 14.9,
-      "trend_strength": 0.228
+      "volatility": 17.8,
+      "trend_strength": 0.111
     },
     "top_3_alternatives": [
       {
@@ -236,133 +236,133 @@
         "score": -38.75
       }
     ],
-    "optimization_date": "2026-02-28T20:11:12.630746",
+    "optimization_date": "2026-03-08T19:31:33.828247",
     "data_range": {
-      "start": "2021-03-02",
-      "end": "2026-02-27",
-      "days": 1274
+      "start": "2021-03-10",
+      "end": "2026-03-06",
+      "days": 1273
     }
   },
   "EURO STOXX 50": {
     "ticker": "EURO STOXX 50",
     "optimal_params": {
-      "atr_period": 14,
-      "multiplier": 2.75,
+      "atr_period": 21,
+      "multiplier": 2.5,
       "ema_period": 200
     },
     "performance": {
-      "atr_period": 14,
-      "multiplier": 2.75,
-      "total_return": 122.65,
-      "num_trades": 17,
-      "win_rate": 0.588,
-      "sharpe": 0.66,
-      "max_drawdown": -26.67,
-      "score": 37.6
+      "atr_period": 21,
+      "multiplier": 2.5,
+      "total_return": 85.52,
+      "num_trades": 21,
+      "win_rate": 0.524,
+      "sharpe": 0.53,
+      "max_drawdown": -32.32,
+      "score": 30.18
     },
     "market_regime": {
-      "regime": "trending",
-      "volatility": 10.8,
-      "trend_strength": 0.834
+      "regime": "ranging",
+      "volatility": 15.3,
+      "trend_strength": 0.396
     },
     "top_3_alternatives": [
       {
-        "atr_period": 14,
-        "multiplier": 2.75,
-        "total_return": 122.65,
-        "num_trades": 17,
-        "win_rate": 0.588,
-        "sharpe": 0.66,
-        "max_drawdown": -26.67,
-        "score": 37.6
-      },
-      {
         "atr_period": 21,
         "multiplier": 2.5,
-        "total_return": 92.39,
-        "num_trades": 19,
-        "win_rate": 0.579,
-        "sharpe": 0.55,
+        "total_return": 85.52,
+        "num_trades": 21,
+        "win_rate": 0.524,
+        "sharpe": 0.53,
         "max_drawdown": -32.32,
-        "score": 32.03
+        "score": 30.18
+      },
+      {
+        "atr_period": 14,
+        "multiplier": 2.75,
+        "total_return": 66.99,
+        "num_trades": 19,
+        "win_rate": 0.526,
+        "sharpe": 0.48,
+        "max_drawdown": -30.81,
+        "score": 28.34
       },
       {
         "atr_period": 10,
-        "multiplier": 2.75,
-        "total_return": 90.16,
-        "num_trades": 18,
-        "win_rate": 0.5,
-        "sharpe": 0.56,
-        "max_drawdown": -33.83,
-        "score": 29.64
+        "multiplier": 3.0,
+        "total_return": 69.69,
+        "num_trades": 17,
+        "win_rate": 0.529,
+        "sharpe": 0.5,
+        "max_drawdown": -35.9,
+        "score": 26.49
       }
     ],
-    "optimization_date": "2026-02-28T20:11:15.704430",
+    "optimization_date": "2026-03-08T19:31:36.988085",
     "data_range": {
-      "start": "2021-03-02",
-      "end": "2026-02-27",
-      "days": 1284
+      "start": "2021-03-10",
+      "end": "2026-03-06",
+      "days": 1283
     }
   },
   "EURO STOXX 600": {
     "ticker": "EURO STOXX 600",
     "optimal_params": {
-      "atr_period": 18,
+      "atr_period": 21,
       "multiplier": 4.0,
       "ema_period": 200
     },
     "performance": {
-      "atr_period": 18,
+      "atr_period": 21,
       "multiplier": 4.0,
-      "total_return": -20.08,
+      "total_return": 2.79,
       "num_trades": 19,
-      "win_rate": 0.211,
-      "sharpe": -0.04,
-      "max_drawdown": -51.57,
-      "score": -33.68
+      "win_rate": 0.263,
+      "sharpe": 0.16,
+      "max_drawdown": -46.84,
+      "score": -14.16
     },
     "market_regime": {
-      "regime": "trending",
-      "volatility": 8.3,
-      "trend_strength": 0.931
+      "regime": "ranging",
+      "volatility": 12.1,
+      "trend_strength": 0.696
     },
     "top_3_alternatives": [
       {
-        "atr_period": 18,
-        "multiplier": 4.0,
-        "total_return": -20.08,
-        "num_trades": 19,
-        "win_rate": 0.211,
-        "sharpe": -0.04,
-        "max_drawdown": -51.57,
-        "score": -33.68
-      },
-      {
         "atr_period": 21,
         "multiplier": 4.0,
-        "total_return": -21.05,
+        "total_return": 2.79,
         "num_trades": 19,
-        "win_rate": 0.211,
-        "sharpe": -0.05,
-        "max_drawdown": -50.49,
-        "score": -33.79
+        "win_rate": 0.263,
+        "sharpe": 0.16,
+        "max_drawdown": -46.84,
+        "score": -14.16
+      },
+      {
+        "atr_period": 18,
+        "multiplier": 4.0,
+        "total_return": -1.81,
+        "num_trades": 19,
+        "win_rate": 0.263,
+        "sharpe": 0.12,
+        "max_drawdown": -47.99,
+        "score": -18.05
       },
       {
         "atr_period": 16,
         "multiplier": 4.0,
-        "total_return": -22.41,
+        "total_return": -4.68,
         "num_trades": 19,
-        "win_rate": 0.211,
-        "sharpe": -0.06,
-        "max_drawdown": -52.98,
-        "score": -35.85
+        "win_rate": 0.263,
+        "sharpe": 0.1,
+        "max_drawdown": -49.51,
+        "score": -20.82
       }
     ],
-    "optimization_date": "2026-02-28T20:11:18.792596",
+    "optimization_date": "2026-03-08T19:31:40.136321",
     "data_range": {
-      "start": "2021-03-02",
-      "end": "2026-02-27",
-      "days": 1284
+      "start": "2021-03-10",
+      "end": "2026-03-06",
+      "days": 1283
     }
   },
   "S&P 500": {
@@ -375,116 +375,116 @@
     "performance": {
       "atr_period": 18,
       "multiplier": 2.5,
-      "total_return": 36.51,
+      "total_return": 38.31,
       "num_trades": 24,
-      "win_rate": 0.333,
-      "sharpe": 0.35,
-      "max_drawdown": -46.18,
-      "score": 7.52
+      "win_rate": 0.292,
+      "sharpe": 0.36,
+      "max_drawdown": -44.0,
+      "score": 8.51
     },
     "market_regime": {
       "regime": "ranging",
-      "volatility": 10.9,
-      "trend_strength": 0.1
+      "volatility": 11.6,
+      "trend_strength": 0.002
     },
     "top_3_alternatives": [
       {
         "atr_period": 18,
         "multiplier": 2.5,
-        "total_return": 36.51,
+        "total_return": 38.31,
         "num_trades": 24,
-        "win_rate": 0.333,
-        "sharpe": 0.35,
-        "max_drawdown": -46.18,
-        "score": 7.52
+        "win_rate": 0.292,
+        "sharpe": 0.36,
+        "max_drawdown": -44.0,
+        "score": 8.51
       },
       {
         "atr_period": 21,
         "multiplier": 2.5,
-        "total_return": 32.84,
+        "total_return": 34.6,
         "num_trades": 24,
-        "win_rate": 0.333,
-        "sharpe": 0.34,
-        "max_drawdown": -46.18,
-        "score": 5.92
+        "win_rate": 0.292,
+        "sharpe": 0.35,
+        "max_drawdown": -44.0,
+        "score": 6.95
       },
       {
         "atr_period": 16,
         "multiplier": 2.5,
-        "total_return": 30.44,
+        "total_return": 32.16,
         "num_trades": 24,
-        "win_rate": 0.333,
-        "sharpe": 0.33,
-        "max_drawdown": -46.18,
-        "score": 4.81
+        "win_rate": 0.292,
+        "sharpe": 0.34,
+        "max_drawdown": -44.0,
+        "score": 5.87
       }
     ],
-    "optimization_date": "2026-02-28T20:11:21.816265",
+    "optimization_date": "2026-03-08T19:31:43.240526",
     "data_range": {
-      "start": "2021-03-02",
-      "end": "2026-02-27",
-      "days": 1255
+      "start": "2021-03-10",
+      "end": "2026-03-06",
+      "days": 1254
     }
   },
   "Dow Jones": {
     "ticker": "Dow Jones",
     "optimal_params": {
-      "atr_period": 16,
-      "multiplier": 2.5,
+      "atr_period": 10,
+      "multiplier": 2.75,
       "ema_period": 200
     },
     "performance": {
-      "atr_period": 16,
-      "multiplier": 2.5,
-      "total_return": 4.4,
-      "num_trades": 26,
-      "win_rate": 0.346,
-      "sharpe": 0.19,
-      "max_drawdown": -60.5,
-      "score": -17.88
+      "atr_period": 10,
+      "multiplier": 2.75,
+      "total_return": 2.48,
+      "num_trades": 24,
+      "win_rate": 0.333,
+      "sharpe": 0.17,
+      "max_drawdown": -57.13,
+      "score": -17.86
     },
     "market_regime": {
       "regime": "ranging",
-      "volatility": 12.2,
-      "trend_strength": 0.643
+      "volatility": 12.8,
+      "trend_strength": 0.201
     },
     "top_3_alternatives": [
       {
+        "atr_period": 10,
+        "multiplier": 2.75,
+        "total_return": 2.48,
+        "num_trades": 24,
+        "win_rate": 0.333,
+        "sharpe": 0.17,
+        "max_drawdown": -57.13,
+        "score": -17.86
+      },
+      {
         "atr_period": 16,
         "multiplier": 2.5,
-        "total_return": 4.4,
+        "total_return": 3.46,
         "num_trades": 26,
         "win_rate": 0.346,
-        "sharpe": 0.19,
-        "max_drawdown": -60.5,
-        "score": -17.88
+        "sharpe": 0.18,
+        "max_drawdown": -60.86,
+        "score": -18.69
       },
       {
         "atr_period": 10,
         "multiplier": 2.5,
-        "total_return": -1.19,
+        "total_return": -2.08,
         "num_trades": 25,
         "win_rate": 0.36,
-        "sharpe": 0.16,
-        "max_drawdown": -61.85,
-        "score": -22.06
-      },
-      {
-        "atr_period": 14,
-        "multiplier": 2.5,
-        "total_return": -3.36,
-        "num_trades": 26,
-        "win_rate": 0.346,
-        "sharpe": 0.14,
-        "max_drawdown": -60.5,
-        "score": -23.18
+        "sharpe": 0.15,
+        "max_drawdown": -62.2,
+        "score": -22.84
       }
     ],
-    "optimization_date": "2026-02-28T20:11:24.835839",
+    "optimization_date": "2026-03-08T19:31:46.367480",
     "data_range": {
-      "start": "2021-03-02",
-      "end": "2026-02-27",
-      "days": 1255
+      "start": "2021-03-10",
+      "end": "2026-03-06",
+      "days": 1254
     }
   },
   "Nasdaq 100": {
@@ -506,8 +506,8 @@
     },
     "market_regime": {
       "regime": "ranging",
-      "volatility": 15.2,
-      "trend_strength": 0.211
+      "volatility": 16.0,
+      "trend_strength": 0.245
     },
     "top_3_alternatives": [
       {
@@ -538,14 +538,14 @@
         "win_rate": 0.385,
         "sharpe": 0.64,
         "max_drawdown": -54.99,
-        "score": 19.46
+        "score": 19.47
       }
     ],
-    "optimization_date": "2026-02-28T20:11:27.848424",
+    "optimization_date": "2026-03-08T19:31:49.414176",
     "data_range": {
-      "start": "2021-03-02",
-      "end": "2026-02-27",
-      "days": 1255
+      "start": "2021-03-10",
+      "end": "2026-03-06",
+      "days": 1254
     }
   }
 }

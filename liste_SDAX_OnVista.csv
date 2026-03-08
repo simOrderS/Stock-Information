@@ -1,70 +1,72 @@
 ticker,isin,branche,idNotation
-Deutsche Wohnen,DE000A0HN5C6,Immobilien,120496604
-TRATON,DE000TRAT0N7,Automobilproduktion,260577582
-DWS Group,DE000DWS1007,Finanzdienstleistungen,213876546
-VERBIO Vereinigte BioEnergie,DE000A0JL9W6,Öl und Gas,270114081
-SÃ¼dzucker,DE0007297004,Nahrungsmittel,120504454
-Metro,DE000BFB0019,KaufhÃ¤user,198654796
-Fielmann,DE0005772206,Sonstige,120504500
-SYNLAB,DE000A2TSL71,Gesundheitsdienstleistungen,332978395
-DÃ¼rr,DE0005565204,Maschinenbau,120481114
-KWS SAAT SE & Co.,DE0007074007,Sonstige,120502023
 1&1 AG,DE0005545503,Telekomdienstleister,120496355
-Dermapharm Holding,DE000A2GS5D8,Pharma,253165146
-ProSiebenSat.1 Media,DE000PSM7770,Broadcasting,120496665
-CompuGroup Medical,DE000A288904,Softwareservice,120480456
-Befesa,LU1704650164,Entsorgung,202102519
-Pfeiffer Vacuum Technology,DE0006916604,Spezialmaschinenbau,120574335
-Auto1 Group SE,DE000A2LQ884,Internetkommerz,322629396
-PNE AG,DE000A0JBPG2,Energieversorger,120478260
-Grand City Properties SA,LU0775917882,Immobilien,191286630
-Baywa,DE0005194062,Sonstige,120496568
-Salzgitter,DE0006202005,Holdings,120470549
-Nagarro,DE000A3H2200,Softwareservice,317330134
-W&W (WÃ¼stenrot & WÃ¼rttembergische),DE0008051004,Mischkonzerne,157548080
-Adtran Holdings,US00486H1059,Netzwerktechnik,367017433
-Hornbach Holding AG & Co.,DE0006083405,Einzelhandel,209551599
-Wacker Neuson,DE000WACK012,Spezialmaschinenbau,120481177
-Adva,DE0005103006,Netzwerktechnik,120504471
-ATOSS Software,DE0005104400,Standardsoftware,300892327
-Bilfinger,DE0005909006,Maschinenbau,120473883
-Energiekontor,DE0005313506,Entsorgung,120512655
-Schaeffler,DE000SHA0159,Automobilzulieferer,144344984
-Kontron AG,AT0000A0E9W5,IT-Dienstleistungen,120470105
-STRATEC Biomedical,DE000STRA555,Medizinische,120473911
-Deutsche Pfandbriefbank,DE0008019001,Banken,137381902
-Cancom,DE0005419105,Telekommunikationsausrüster,120480595
-Eckert & Ziegler,DE0005659700,Medizinische,120468988
-KlÃ¶ckner & Co,DE000KC01000,Eisen,120506267
-Elmos Semiconductor,DE0005677108,Halbleiterindustrie,120495956
-VARTA,DE000A0TGJ55,Elektrotechnologie,200788566
-GRENKE,DE000A161N30,IT-Dienstleistungen,120470535
-Patrizia SE,DE000PAT1AG3,Immobilien,120504446
-Ceconomy,DE0007257503,Telekomdienstleister,120480521
-GFT,DE0005800601,Spezialsoftware,120502245
 adesso,DE000A0Z23Q5,Softwareservice,228925695
-SGL Carbon,DE0007235301,Chemie,120496934
-JOST Werke,DE000JST4000,Maschinenbau,193498508
-flatexDEGIRO AG,DE000FTG1111,Makler,294275453
-Vossloh,DE0007667107,Sonstige,120496512
-Amadeus FiRe,DE0005093108,Sonstige,120503990
+Adva,DE0005103006,Netzwerktechnik,120504471
+Alzchem Group AG,DE000A2YNT30,Holdings,228825706
+ATOSS Software,DE0005104400,Standardsoftware,300892327
+Befesa,LU1704650164,Entsorgung,202102519
+Borussia Dortmund BVB,DE0005493092,Sport,120471156
+Cancom,DE0005419105,Telekommunikationsausrüster,120480595
 CEWE,DE0005403901,Sonstige,120481147
+Dermapharm Holding,DE000A2GS5D8,Pharma,253165146
+Deutsche Beteiligungs AG,DE000A1TNUT7,Finanzdienstleistungen,120480357
+Deutsche Euroshop,DE0007480204,Immobilien,120497031
+Deutsche Pfandbriefbank,DE0008019001,Banken,137381902
+Deutz,DE0006305006,Spezialmaschinenbau,120477538
+Douglas,DE000BEAU1Y4,Drogerie und Kosmetikgueter,455648485
+Draengerwerk,DE0005550636,Medizinische,120476934
+DWS Group,DE000DWS1007,Finanzdienstleistungen,213876546
+Duerr,DE0005565204,Maschinenbau,120481114
+Eckert & Ziegler,DE0005659700,Medizinische,120468988
+Elmos Semiconductor,DE0005677108,Halbleiterindustrie,120495956
+Energiekontor,DE0005313506,Entsorgung,120512655
+Evotec,DE0005664809,Biotechnologie,120496318
+Friedrich Vorwerk,DE000A255F11,Sonstige Technologie,328524496
+Gerresheimer,DE000A0LD6E6,Medizinische Geräte,120473968
+GFT Technologies,DE0005800601,Spezialsoftware,120502245
+Grand City Properties SA,LU0775917882,Immobilien,191286630
+GRENKE,DE000A161N30,IT-Dienstleistungen,120470535
+Hamborner REIT,DE000A3H2333,Immobilien,322665436
+Heidelberger Druckmaschinen,DE0007314007,Spezialmaschinenbau,120506268
+HelloFresh,DE000A161408,Einzelhandel,202005049
+Hornbach Holding AG & Co.,DE0006083405,Einzelhandel,209551599
 HYPOPORT,DE0005493365,IT-Software,150179343
 INDUS Holding,DE0006200108,Finanzdienstleistungen,120497455
-NORMA Group,DE000A1H8BV3,Baumaterial,120477117
-Deutsche Beteiligungs AG,DE000A1TNUT7,Finanzdienstleistungen,120480357
-Deutz,DE0006305006,Spezialmaschinenbau,120477538
-Morphosys,DE0006632003,Pharma,120480773
-Heidelberger Druckmaschinen,DE0007314007,Spezialmaschinenbau,120506268
-SFC Energy,DE0007568578,Sonstige,263798426
-Borussia Dortmund BVB,DE0005493092,Sport,120471156
-PVA TePla,DE0007461006,Halbleiterindustrie,128086352
-SAF Holland,DE000SAFH001,Automobilzulieferer,120479583
-Sto SE,DE0007274136,Chemie,120478837
-Mutares,DE000A2NB650,Finanzdienstleistungen,281203147
-DrÃ¤gerwerk,DE0005550636,Medizinische,120476934
+Jenoptik,DE000A2NB601,Sonstige Technologie,120477456
+JOST Werke,DE000JST4000,Maschinenbau,193498508
+Kloeckner & Co,DE000KC01000,Eisen,120506267
+Kontron AG,AT0000A0E9W5,IT-Dienstleistungen,120470105
 KSB Vz,DE0006292030,Spezialmaschinenbau,120521352
-SÃ¼ss Microtec,DE000A1K0235,Elektrotechnologie,120478370
-SCHOTT Pharma,DE000A3ENQ51,-,435067179
-Thyssenkrupp Nucera,DE000NCA0001,Entsorgung,426308985
-IONOS,DE000A3E00M1,IT-Software,410387253
+KWS SAAT SE & Co.,DE0007074007,Sonstige,120502023
+MBB,DE000A0ETBQ4,Holdings,120522516
+MEDIOS,DE000A1MMCC8,Pharma,216548990
+MLP,DE0006569908,Finanzdienstleistungen,120478029
+Mutares,DE000A2NB650,Finanzdienstleistungen,281203147
+Nagarro,DE000A3H2200,Softwareservice,317330134
+NORMA Group,DE000A1H8BV3,Baumaterial,120477117
+Ottobock,DE000BCK2223,Medizinische Geräte,527805288
+Patrizia SE,DE000PAT1AG3,Immobilien,120504446
+PNE AG,DE000A0JBPG2,Energieversorger,120478260
+ProSiebenSat.1 Media,DE000PSM7770,Broadcasting,120496665
+PSI SOFTWARE,DE000A0Z1JH9,Spezialsoftware,120585940
+PVA TePla,DE0007461006,Sonstige Technologie,128086352
+SAF Holland,DE000SAFH001,Automobilzulieferer,120479583
+Salzgitter,DE0006202005,Holdings,120470549
+Schaeffler,DE000SHA0159,Automobilzulieferer,144344984
+SCHOTT Pharma,DE000A3ENQ51,Medizinische Geräte,435067179
+secunet,DE0007276503,IT Dienstleistungen,300892326
+SFC Energy,DE0007568578,Sonstige,263798426
+Siltronic,DE000WAF3001,Halbleiterindustrie,150197151
+Sixt SE,DE0007231326,Autovermietungen,120519094
+SMA Solar,DE000A0DJ6J9,Sonstige Branchen,120472434
+Springer Nature,DE000SPG1003,Sonstige Branchen,478949908
+Stabilus,DE000STAB1L8,Automobilzulieferer,165808005
+Sto SE,DE0007274136,Baumaterial und -komponenten,120478837
+Suedzucker,DE0007297004,Nahrungsmittel,120504454
+SUSS Microtec,DE000A1K0235,Elektrotechnologie,120478370
+Tonies,LU2333563281,Finanzdienstleistungen,332978396
+VERBIO Vereinigte BioEnergie,DE000A0JL9W6,Öl und Gas,270114081
+Verve Group,SE0018538068,Sonstige Konsumgüter,253169967
+Vossloh,DE0007667107,Sonstige,120496512
+W&W (Wuestenrot & Wuerttembergische),DE0008051004,Mischkonzerne,157548080
+Wacker Neuson,DE000WACK012,Spezialmaschinenbau,120481177
