@@ -278,13 +278,16 @@ def main():
     now_str = datetime.now(GERMANY_TZ).strftime("%d.%m.%Y %H:%M %Z")
     print(f"[{now_str}] Scanning for price shocks ≥ {GAP_THRESHOLD}% vs previous close")
 
-    df_stocks = get_stock_realtime_data(LIST_STOCKS)
+    df_stocks_all = pd.concat(
+        [get_stock_realtime_data(f) for f in LIST_STOCKS],
+        ignore_index=True
+    )
 
-    if df_stocks.empty:
+    if df_stocks_all.empty:
         print("No data retrieved, exiting.")
         return
 
-    df_shocks = filter_price_shocks(df_stocks, threshold=GAP_THRESHOLD)
+    df_shocks = filter_price_shocks(df_stocks_all, threshold=GAP_THRESHOLD)
 
     print(f"Stocks with |gap| ≥ {GAP_THRESHOLD}%: {len(df_shocks)}")
     if not df_shocks.empty:
