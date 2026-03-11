@@ -8,6 +8,7 @@ import requests
 import pandas as pd
 from datetime import datetime, timezone
 from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 pd.set_option('max_colwidth', None)
 pd.options.display.max_rows = 20
@@ -16,7 +17,7 @@ pd.options.display.float_format = '{:0.2f}'.format
 # --- Config ---
 TELEGRAM_TOKEN   = os.getenv("TELEGRAM_TOKEN_GAP_REV")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-LIST_STOCKS      = 'liste_DAX40_OnVista.csv'
+LIST_STOCKS      = ['liste_DAX40_OnVista.csv', 'liste_MDAX_OnVista.csv', 'liste_SDAX_OnVista.csv']
 GERMANY_TZ       = pytz.timezone("Europe/Berlin")
 GAP_THRESHOLD    = float(os.getenv("GAP_THRESHOLD", "5.0"))  # % default 5.0
 
@@ -96,78 +97,59 @@ def _parse_datetime(value):
     return None
 
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+def fetch_quote(row, session):
+    try:
+        url = f"https://api.onvista.de/api/v1/notations/{row['idNotation']}/quote"
+        r = session.get(url, timeout=5)
+        r.raise_for_status()
+        q = r.json()
+        return {
+            "ticker": row['ticker'],
+            "isin": row['isin'],
+            "branche": row['branche'],
+            "idNotation": row['idNotation'],
+            "isoCurrency": q.get("isoCurrency"),
+            "marketIsOpen": q.get("marketIsOpen"),
+            "date": _parse_datetime(q.get("datetimeLast")),
+            "open": q.get("first"),
+            "close": q.get("last"),
+            "high": q.get("high"),
+            "low": q.get("low"),
+            "volume": q.get("volumeDay"),
+            "bid": q.get("bid"),
+            "ask": q.get("ask"),
+            "previousClose": q.get("previousLast"),
+            "performance": q.get("performance"),
+            "performancePct": q.get("performancePct"),
+        }
+    except Exception as e:
+        print(f"[{row['ticker']}] Request failed: {e}")
+        return None
+
 def get_stock_realtime_data(list_file):
-    """
-    Fetch current quote for every stock in list_file via the OnVista API.
-    Endpoint: GET /api/v1/notations/{idNotation}/quote
-
-    Parameters
-    ----------
-    list_file : str — CSV with columns: ticker, isin, branche, idNotation
-
-    Returns
-    -------
-    pd.DataFrame — one row per stock with current quote fields
-    """
     df_list = pd.read_csv(list_file)
-
     headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        ),
+        "User-Agent": "Mozilla/5.0 ...",
         "Accept": "application/json",
         "Referer": "https://www.onvista.de/",
     }
-
     session = requests.Session()
     session.headers.update(headers)
-
     rows = []
-    for ind in tqdm(df_list.index, desc='Fetching realtime quotes...'):
-        ticker     = df_list.loc[ind, 'ticker']
-        isin       = df_list.loc[ind, 'isin']
-        idNotation = df_list.loc[ind, 'idNotation']
-        branche    = df_list.loc[ind, 'branche']
 
-        url = f"https://api.onvista.de/api/v1/notations/{idNotation}/quote"
-
-        try:
-            r = session.get(url, timeout=5)
-            r.raise_for_status()
-            q = r.json()
-        except requests.RequestException as e:
-            print(f"[{ticker}] Request failed: {e}")
-            continue
-        except ValueError as e:
-            print(f"[{ticker}] JSON parse error: {e}")
-            continue
-
-        rows.append({
-            "ticker":        ticker,
-            "isin":          isin,
-            "branche":       branche,
-            "idNotation":    idNotation,
-            "isoCurrency":   q.get("isoCurrency"),
-            "marketIsOpen":  q.get("marketIsOpen"),
-            "date":          _parse_datetime(q.get("datetimeLast")),
-            "open":          q.get("first"),
-            "close":         q.get("last"),
-            "high":          q.get("high"),
-            "low":           q.get("low"),
-            "volume":        q.get("volumeDay"),
-            "bid":           q.get("bid"),
-            "ask":           q.get("ask"),
-            "previousClose": q.get("previousLast"),
-            "performance":   q.get("performance"),
-            "performancePct":q.get("performancePct"),
-        })
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(fetch_quote, df_list.loc[i], session) for i in df_list.index]
+        for f in tqdm(as_completed(futures), total=len(futures), desc="Fetching realtime quotes..."):
+            result = f.result()
+            if result:
+                rows.append(result)
 
     df_stocks = pd.DataFrame(rows)
     if not df_stocks.empty:
         df_stocks.sort_values("ticker", inplace=True)
         df_stocks.reset_index(drop=True, inplace=True)
-
     return df_stocks
 
 
