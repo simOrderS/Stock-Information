@@ -17,7 +17,7 @@ pd.options.display.float_format = '{:0.2f}'.format
 # --- Config ---
 TELEGRAM_TOKEN   = os.getenv("TELEGRAM_TOKEN_GAP_REV")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-LIST_STOCKS      = ['liste_DAX40_OnVista.csv', 'liste_MDAX_OnVista.csv', 'liste_SDAX_OnVista.csv']
+LIST_STOCKS      = ['liste_DAX40_OnVista.csv', 'liste_MDAX_OnVista.csv', 'liste_SDAX_OnVista.csv', 'liste_Nasdaq100.csv']
 GERMANY_TZ       = pytz.timezone("Europe/Berlin")
 GAP_THRESHOLD    = float(os.getenv("GAP_THRESHOLD", "5.0"))  # % default 5.0
 
