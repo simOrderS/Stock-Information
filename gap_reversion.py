@@ -243,7 +243,7 @@ def generate_messages(df_shocks: pd.DataFrame, threshold: float):
         else:
             return ["background-color:lightgreen;color:black"] * len(row)
 
-    caption = f"<b>{now.strftime('%d.%m.%Y')}<b>: {len(df)} ticker(s)"
+    caption = f"<b>{now.strftime('%d.%m.%Y')}</b>: {len(df)} ticker(s)"
     filename = f"price_shocks.html"
 
     # Apply pandas styling
@@ -252,7 +252,7 @@ def generate_messages(df_shocks: pd.DataFrame, threshold: float):
         .format({
             "Price": "{:,.2f}",
             "Prev Close": "{:,.2f}",
-            "Gap %": "{:+.2f}%",
+            "Gap %": "{:+.1f}%",
             "Volume": "{:,.0f}",
         })
         .apply(highlight_row, axis=1)
