@@ -6,10 +6,10 @@ on:
     - cron: "28 6 * * 1-5"
     # First open snapshot: 07:32 CET → 06:32 UTC
     - cron: "32 6 * * 1-5"
-    # Reversion check: 08:30 CET → 07:30 UTC
-    - cron: "30 7 * * 1-5"
-    # Optional second check: 09:00 CET → 08:00 UTC
-    - cron: "0 8 * * 1-5"
+    # Reversion check: 08:32 CET → 07:30 UTC
+    - cron: "32 7 * * 1-5"
+    # Optional second check: 09:02 CET → 08:00 UTC
+    - cron: "2 8 * * 1-5"
   workflow_dispatch:  # allow manual trigger
 
 permissions:

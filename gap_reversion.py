@@ -206,7 +206,7 @@ def generate_messages(df_shocks: pd.DataFrame, threshold: float):
 
     if df_shocks.empty:
         send_telegram("sendMessage", 
-                      text=f"<b>{now.strftime('%d.%m.%Y')}: Price shocks ≥ {threshold:.0f}%</b>\n\nNo stocks moved.")
+                      text=f"<b>{now.strftime('%d.%m.%Y')}:</b> No stocks moved.")
         return
 
     # Sort by gap ascending (largest drop first)
@@ -242,7 +242,7 @@ def generate_messages(df_shocks: pd.DataFrame, threshold: float):
         else:
             return ["background-color:lightgreen;color:black"] * len(row)
 
-    caption = f"{now.strftime('%d.%m.%Y %H:%M')}h: {len(df)} ticker(s)"
+    caption = f"<b>{now.strftime('%d.%m.%Y')}<b>: {len(df)} ticker(s)"
     filename = f"price_shocks.html"
 
     # Apply pandas styling
