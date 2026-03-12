@@ -224,13 +224,14 @@ def generate_messages(df_shocks: pd.DataFrame, threshold: float):
     )
 
     # Select & rename columns
-    df = df[["ticker", "ISIN", "previousClose", "close", "gap_pct", "Time"]]
+    df = df[["ticker", "ISIN", "previousClose", "close", "gap_pct", "volume", "Time"]]
     df.rename(
         columns={
             "ticker": "Ticker",
             "close": "Price",
             "previousClose": "Prev Close",
             "gap_pct": "Gap %",
+            "volume": "Volume",
         },
         inplace=True,
     )
@@ -252,6 +253,7 @@ def generate_messages(df_shocks: pd.DataFrame, threshold: float):
             "Price": "{:,.2f}",
             "Prev Close": "{:,.2f}",
             "Gap %": "{:+.2f}%",
+            "Volume": "{:,.0f}",
         })
         .apply(highlight_row, axis=1)
         .set_caption(f"Price shocks >= {threshold:.0f}%")
