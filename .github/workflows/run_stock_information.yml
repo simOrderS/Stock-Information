@@ -2,7 +2,7 @@ name: Generate Daily STOCK Charts
 
 on:
   schedule:
-    - cron: "15 5 * * 2-6"    # Mon–Fri at 06:15 UTC
+    - cron: "15 3 * * 2-6"
   workflow_dispatch:      # also allows manual trigger
 
 permissions:
@@ -51,16 +51,16 @@ jobs:
         run: |
           python stock_information_MDAX.py
 
-      # Step 6: Run SDAX script
-      - name: Run SDAX stock script
+      # Step 6: Run Nasdaq script
+      - name: Run NASDAQ stock script
         env:
-          TELEGRAM_TOKEN_SDAX: ${{ secrets.TELEGRAM_TOKEN_SDAX }}
+          TELEGRAM_TOKEN_SDAX: ${{ secrets.TELEGRAM_TOKEN_NASDAQ }}
           TELEGRAM_TOKEN_SANDBOX: ${{ secrets.TELEGRAM_TOKEN_SANDBOX }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python stock_information_SDAX.py
+          python stock_information_NASDAQ.py
 
-      # Step 5: Commit generated charts
+      # Step 7: Commit generated charts
       - name: Commit and push charts
         run: |
           git config --local user.name "github-actions[bot]"

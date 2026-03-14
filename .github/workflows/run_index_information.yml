@@ -2,7 +2,7 @@ name: Generate Daily INDEX Charts
 
 on:
   schedule:
-    - cron: "0 5 * * 2-6"    # Mon–Fri at 06:00 UTC
+    - cron: "0 3 * * 2-6"
   workflow_dispatch:      # also allows manual trigger
 
 permissions:
