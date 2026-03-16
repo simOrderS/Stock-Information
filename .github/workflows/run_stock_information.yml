@@ -54,7 +54,7 @@ jobs:
       # Step 6: Run Nasdaq script
       - name: Run NASDAQ stock script
         env:
-          TELEGRAM_TOKEN_SDAX: ${{ secrets.TELEGRAM_TOKEN_NASDAQ }}
+          TELEGRAM_TOKEN_NASDAQ: ${{ secrets.TELEGRAM_TOKEN_NASDAQ }}
           TELEGRAM_TOKEN_SANDBOX: ${{ secrets.TELEGRAM_TOKEN_SANDBOX }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
