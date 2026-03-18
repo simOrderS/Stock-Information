@@ -27,8 +27,8 @@ pd.options.display.float_format = '{:0.2f}'.format
 TELEGRAM_TOKEN_NASDAQ = os.getenv("TELEGRAM_TOKEN_NASDAQ")
 TELEGRAM_TOKEN_SANDBOX = os.getenv("TELEGRAM_TOKEN_SANDBOX")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-DATA_FILE_NASDAQ = "history_NASDAQ_gettex.csv"
-LIST_NASDAQ = 'liste_Nasdaq100.csv'
+DATA_FILE_NASDAQ = "history_NASDAQ100_gettex.csv"
+LIST_NASDAQ = 'liste_NASDAQ100_OnVista.csv'
 
 
 def send_telegram(method_name, text=None, url=None, document=None, filename=None, caption=None):

@@ -2,51 +2,50 @@ ticker,isin,branche,idNotation
 Aixtron,DE000A0WMPJ6,Halbleiterindustrie,120477368
 Aroundtown,LU1673108939,Immobilien,198655220
 Aumovio,DE000AUM0V10,Automobilzulieferer,524835577
-Aurubis,DE0006766504,Rohstoffe,120471505
+Aurubis,DE0006766504,Metallverarbeitung,120471505
 Auto1,DE000A2LQ884,Internetkommerz,322629396
 Bechtle,DE0005158703,IT-Dienstleistungen,120496054
 Bilfinger,DE0005909006,Dienstleistungen,120473883
 Carl Zeiss Meditec,DE0005313704,Medizinische Geräte,120473863
 CTS Eventim,DE0005470306,Entertainment / Dienstleistungen,120480606
-Delivery Hero,DE000A2E4K43,Internetkommerz,192075741
+Delivery Hero,DE000A2E4K43,Einzelhandel,192075741
 Deutsche Lufthansa,DE0008232125,Fluggesellschaften,120500104
-Deutsche Wohnen,DE000A0HN5C6,Immobilien,120496604
-DWS Group,DE000DWS1007,Finanzdienstleistung,213876546
-Evonik,DE000EVNK013,Chemie,120496265
+DWS Group,DE000DWS1007,Finanzdienstleistungen,213876546
+Evonik,DE000EVNK013,Spezialchemie,120496265
 Fielmann,DE0005772206,Einzelhandel,120504500
-flatexDEGIRO,DE000FTG1111,Finanzdienstleistung,294275453
-Fraport,DE0005773303,Sonstige Branchen,120477065
+flatexDEGIRO,DE000FTG1111,Finanzdienstleistungen,294275453
+Fraport,DE0005773303,Gütertransport,120477065
 Freenet,DE000A0Z2ZZ5,Telekomdienstleister,120500650
-Fuchs,DE000A3E5D64,Chemie,120496454
+Fuchs (Vorzugsaktien),DE000A3E5D64,Spezialchemie,120496454
 Hella,DE000A13SX22,Automobilzulieferer,135702360
-Hensoldt,DE000HAG0005,Luft- und Raumfahrtindustrie,308187542
+Hensoldt,DE000HAG0005,Elektrotechnologie,308187542
 Hochtief,DE0006070006,Bauhauptgewerbe,120477085
 Hugo Boss,DE000A1PHFF7,Bekleidungsartikel,120477105
 IONOS,DE000A3E00M1,Internetkommerz,410387253
 Jungheinrich,DE0006219934,Spezialmaschinenbau,120480608
-K+S,DE000KSAG888,Sonstige Energie / Rohstoffe,120496963
+K+S,DE000KSAG888,Chemie,120496963
 Kion Group,DE000KGX8881,Spezialmaschinenbau,120504431
 Knorr-Bremse,DE000KBX1006,Automobilzulieferer,232166785
 Krones,DE0006335003,Spezialmaschinenbau,120504434
 Lanxess,DE0005470405,Chemie,120479800
 LEG Immobilien,DE000LEG1110,Immobilien,120504467
-Nemetschek,DE0006452907,Softwareservice / -dienstleistung,120481230
-Nordex,DE000A0D6554,Kunststoffe,120473853
-Porsche AG,DE000PAG9113,Automobilproduktion,395753451
+Nemetschek,DE0006452907,Spezialsoftware,120481230
+Nordex,DE000A0D6554,Sonstige Branchen,120473853
+Porsche AG Vz.,DE000PAG9113,Automobilproduktion,395753451
 Puma,DE0006969603,Sportartikel,120496474
-Rational,DE0007010803,Spezialmaschinenbau,120481095
-Redcare Pharmacy,NL0012044747,Versandhandel,172767049
+Rational,DE0007010803,Sonstige Konsumgüter,120481095
+Redcare Pharmacy,NL0012044747,Internetkommerz,172767049
 RENK Group,DE000RENK730,Spezialmaschinenbau,450020459
 RTL,LU0061462528,Broadcasting (TV und Radio),120476760
-Sartorius,DE0007165631,Holdings,120511832
+Sartorius Vz.,DE0007165631,Spezialmaschinenbau,120511832
 Schaeffler,DE000SHA0100,Automobilzulieferer,478649142
-Stroeer,DE0007493991,Entertainment / Dienstleistungen,120470581
-TAG Immobilien AG,DE0008303504,Immobilien,120481355
+Ströer,DE0007493991,Sonstige Branchen,120470581
+TAG Immobilien,DE0008303504,Immobilien,120481355
 Talanx,DE000TLX1005,Versicherungen,120504508
-TeamViewer,DE000A2YN900,Standardsoftware,269082547
-ThyssenKrupp,DE0007500001,Eisen / Stahlindustrie,120477055
+TeamViewer,DE000A2YN900,Spezialsoftware,269082547
+Thyssenkrupp,DE0007500001,Eisen / Stahlindustrie,120477055
 TKMS,DE000TKMS001,Schifffahrt,529428492
 TRATON,DE000TRAT0N7,Automobilproduktion,260577582
 TUI,DE000TUAG505,Touristik und Freizeit,412446954
-United Internet,DE0005089031,Telekomdienstleister,120470313
-Wacker Chemie,DE000WCH8881,Chemie,120495892
+United Internet,DE0005089031,Internetservice,120470313
+Wacker Chemie,DE000WCH8881,Spezialchemie,120495892

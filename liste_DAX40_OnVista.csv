@@ -1,41 +1,41 @@
-﻿ticker,isin,branche,idNotation
-Adidas,DE000A1EWWW0,Sportartikel,120511652
+ticker,isin,branche,idNotation
+adidas,DE000A1EWWW0,Sportartikel,120511652
 Airbus Group (EADS),NL0000235190,Luft- und Raumfahrtindustrie,120477120
 Allianz,DE0008404005,Versicherungen,120479024
 BASF,DE000BASF111,Chemie,120496409
 Bayer,DE000BAY0017,Pharma,120495749
-Beiersdorf,DE0005200000,Drogerie und Kosmetikgueter,120502139
+Beiersdorf,DE0005200000,Drogerie und Kosmetikgüter,120502139
 BMW,DE0005190003,Automobilproduktion,120481135
 Brenntag,DE000A1DAHH0,Chemie,120473206
 Commerzbank,DE000CBK1001,Banken,120502086
 Continental,DE0005439004,Automobilzulieferer,120504464
-Daimler Truck,DE000DTR0CK8,Sonstige Kraftfahrzeugindustrie,360937461
-Deutsche Boerse,DE0005810055,Finanzdienstleistungen,120479828
+Daimler Truck,DE000DTR0CK8,Automobilproduktion,360937461
 Deutsche Bank,DE0005140008,Banken,120502181
-Deutsche Post,DE0005552004,GÃ¼tertransport,120470657
+Deutsche Börse,DE0005810055,Finanzdienstleistungen,120479828
+Deutsche Post,DE0005552004,Gütertransport,120470657
 Deutsche Telekom,DE0005557508,Telekomdienstleister,120480659
 EON,DE000ENAG999,Energieversorger,120473906
 Fresenius,DE0005785604,Gesundheitsdienstleistungen,120470544
-Fresenius Medical Care,DE0005785802,Medizinische Geraete,120471204
+Fresenius Medical Care,DE0005785802,Medizinische Geräte,120471204
 GEA Group,DE0006602006,Spezialmaschinenbau,120501108
-Hannover Rueck,DE0008402215,Versicherungen,120495880
+Hannover Rück,DE0008402215,Versicherungen,120495880
 Heidelberg Materials,DE0006047004,Baumaterial und -komponenten,120480751
-Henkel Vz.,DE0006048432,Chemie,120497065
+Henkel Vz.,DE0006048432,Drogerie und Kosmetikgüter,120497065
 Infineon,DE0006231004,Halbleiterindustrie,120479489
 Mercedes-Benz Group (Daimler),DE0007100000,Automobilproduktion,120480705
 Merck,DE0006599905,Pharma,120500447
 MTU Aero Engines,DE000A0D9PT0,Luft- und Raumfahrtindustrie,120477093
-Munchener Ruck,DE0008430026,Versicherungen,120481365
+Münchener Rück,DE0008430026,Versicherungen,120481365
 Porsche Automobil Holding,DE000PAH0038,Automobilproduktion,120504450
-Qiagen,NL0015002CX3,Biotechnologie,540446677
-Rheinmetall,DE0007030009,Luft- und Raumfahrtindustrie,120477473
+Qiagen,NL0015002SN0,Biotechnologie,540446677
+Rheinmetall,DE0007030009,Maschinenbau,120477473
 RWE,DE0007037129,Energieversorger,120585171
-SAP,DE0007164600,Softwareservice / -dienstleistung,120499220
+SAP,DE0007164600,Standardsoftware,120499220
 Scout24,DE000A12DM80,Internetkommerz,143582886
-Siemens,DE0007236101,Elektrotechnologie,120479869
-Siemens Energy,DE000ENER6Y0,Elektrotechnologie,308318487
-Siemens Healthineers,DE000SHL1006,Medizinische Geraete,213170302
-Symrise,DE000SYM9999,Nahrungsmittel,120502121
+Siemens,DE0007236101,Spezialmaschinenbau,120479869
+Siemens Energy,DE000ENER6Y0,Sonstige Branchen,308318487
+Siemens Healthineers,DE000SHL1006,Medizinische Geräte,213170302
+Symrise,DE000SYM9999,Spezialchemie,120502121
 Volkswagen (VW) Vz,DE0007664039,Automobilproduktion,120480429
 Vonovia,DE000A1ML7J1,Immobilien,120473207
-Zalando,DE000ZAL1111,Internetkommerz,120473226
+Zalando,DE000ZAL1111,Bekleidungsartikel,120473226
