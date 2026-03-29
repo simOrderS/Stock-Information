@@ -36,7 +36,7 @@ jobs:
       # Step 4: Run prediction script
       - name: Run next day prediction script
         env:
-          TELEGRAM_TOKEN_DAX: ${{ secrets.TELEGRAM_TOKEN_INDEX }}
+          TELEGRAM_TOKEN_INDEX: ${{ secrets.TELEGRAM_TOKEN_INDEX }}
           TELEGRAM_TOKEN_SANDBOX: ${{ secrets.TELEGRAM_TOKEN_SANDBOX }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
