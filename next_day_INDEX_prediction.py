@@ -43,6 +43,7 @@ pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:0.2f}'.format
 
 import index_information
+import GPT_trader_analysis
 
 # ─────────────────────────────────────────────────────────
 # CONFIG
@@ -450,6 +451,18 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180):
                 f"ML: N/A (insufficient history)"
             )
 
+        # ── GPT trader advice ───────────────────────────────────
+        signal = GPT_trader_analysis.build_signal(
+            ticker        = ticker,
+            latest        = latest,
+            prob_up       = prob_up if prob_up is not None else 0.5,
+            wf_acc        = wf_acc,
+            has_intraday  = has_intraday,
+            df_intra      = df_intra,
+            intra_features= intra_features,
+        )
+        gpt_advice = GPT_trader_analysis.get_trader_advice(signal)
+
         # ── Chart ────────────────────────────────────────────────
         sup_p        = index_information.get_supertrend_params(ticker)
         title        = (f"{ticker} · {df_ticker['isin'].iloc[0]} · "
@@ -506,6 +519,8 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180):
             f"ADX: {adx}\n"
             f"────────────────" + "\n"
             f"{prob_text}\n"
+            f"────────────────" + "\n"
+            f"{gpt_advice}\n"
         )
 
         index_information.send_telegram("sendPhoto", filename=fn_png, caption=summary, url=chart_url)
