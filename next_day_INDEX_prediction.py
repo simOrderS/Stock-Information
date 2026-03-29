@@ -52,8 +52,6 @@ TELEGRAM_TOKEN_SANDBOX = os.getenv("TELEGRAM_TOKEN_SANDBOX")
 TELEGRAM_CHAT_ID       = os.getenv("TELEGRAM_CHAT_ID")
 DATA_FILE_INDEX        = "history_INDEX.csv"
 LIST_INDEX             = "liste_INDEX_OnVista.csv"
-#DATA_FILE_INDEX        = "history_DAX40.csv"
-#LIST_INDEX             = "liste_DAX40_OnVista.csv"
 
 # Walk-forward settings
 WF_MIN_TRAIN        = 200   # minimum daily rows before first prediction
@@ -93,7 +91,7 @@ def fetch_intraday_today(idNotation: str) -> pd.DataFrame:
     Last 2 rows (session-close artifact) are dropped.
     """
     url = (
-        f"https://api.onvista.de/api/v1/instruments/STOCK/{idNotation}"
+        f"https://api.onvista.de/api/v1/instruments/INDEX/{idNotation}"
         f"/chart_history?idNotation={idNotation}"
         f"&range=D1&resolution=3m&withCurrentDay=true&withEarnings=false"
     )
