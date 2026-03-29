@@ -40,7 +40,7 @@ jobs:
           TELEGRAM_TOKEN_SANDBOX: ${{ secrets.TELEGRAM_TOKEN_SANDBOX }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python next_day_index_prediction.py
+          python next_day_INDEX_prediction.py
 
       # Step 7: Commit generated charts
       - name: Commit and push charts
