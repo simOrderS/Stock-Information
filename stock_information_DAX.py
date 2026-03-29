@@ -574,7 +574,7 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
 
     for ticker in tqdm(df_recent["ticker"].unique(), desc="Generating messages..."):
         df_ticker = df_recent[df_recent["ticker"] == ticker].sort_values("date")
-
+        
         if len(df_ticker) < 2:
             continue
 

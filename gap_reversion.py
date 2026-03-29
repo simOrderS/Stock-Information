@@ -20,7 +20,7 @@ TELEGRAM_TOKEN   = os.getenv("TELEGRAM_TOKEN_GAP_REV")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 LIST_STOCKS      = ['liste_DAX40_OnVista.csv', 'liste_MDAX_OnVista.csv', 'liste_NASDAQ100_OnVista.csv']
 GERMANY_TZ       = pytz.timezone("Europe/Berlin")
-GAP_THRESHOLD    = float(os.getenv("GAP_THRESHOLD", "5.0"))
+GAP_THRESHOLD    = float(os.getenv("GAP_THRESHOLD", "3.0"))
 
 
 # ─────────────────────────────────────────────
