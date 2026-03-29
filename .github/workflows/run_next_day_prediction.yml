@@ -1,4 +1,4 @@
-name: Generate Daily STOCK Charts
+name: Generate Next Day Prediction
 
 on:
   schedule:
