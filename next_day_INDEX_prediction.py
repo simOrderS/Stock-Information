@@ -1,43 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-"""
-Next-Day Direction Predictor  —  fixed version
-===============================================
-Fixes vs original:
-
-  BUG 1  Intraday feature mismatch
-         Intraday features were NaN for ALL historical rows and only real for
-         today. The walk-forward model never saw them, so attaching them at
-         prediction time was misleading (LightGBM silently ignored them or
-         used the split "is this NaN?" as a spurious signal).
-         FIX: intraday features are kept as a SEPARATE scoring layer, not
-         fed into the ML model. The ML model uses only daily features, which
-         are consistently available for the full history.
-
-  BUG 2  Regime shift / bull-market bias
-         Training on 800+ days of historical data (mostly bull) means the
-         model learns a base rate of ~58% UP and keeps predicting UP even
-         during a crash. Two weeks of wrong calls in a row is the classic
-         symptom of an unweighted model meeting a regime change.
-         FIX: exponential sample weights (half_life=WEIGHT_HALF_LIFE_DAYS)
-         so recent rows dominate training without throwing away history.
-
-  BUG 3  No early stopping → overfitting
-         300 trees on ~1 000 rows with max_depth=4 has capacity to memorise.
-         FIX: early_stopping_rounds=30 against a small held-out validation
-         slice (last 10% of training data).
-
-  BUG 4  Walk-forward accuracy reported for the wrong model
-         WF accuracy was measured on a model WITHOUT intraday features, but
-         the number was displayed as the accuracy of the final prediction.
-         FIX: WF accuracy now covers only daily-feature model, and is clearly
-         labelled as such. Intraday signals are shown separately.
-
-  BONUS  Confidence gate
-         Predictions with |prob - 0.5| < CONFIDENCE_THRESHOLD are labelled
-         "NEUTRAL" instead of forcing a UP/DOWN call. This reduces noise and
-         improves the signal-to-noise ratio of the alerts.
-"""
 
 import os
 import json
@@ -69,6 +31,7 @@ pd.options.display.float_format = '{:0.2f}'.format
 import index_information
 import GPT_trader_analysis
 
+
 # ─────────────────────────────────────────────────────────
 # CONFIG
 # ─────────────────────────────────────────────────────────
@@ -83,24 +46,21 @@ WF_MIN_TRAIN        = 200   # minimum daily rows before first prediction
 WF_ACCURACY_WINDOW  = 252   # evaluate accuracy on last ~1 year of rows
 
 # Rolling training window — only use the most recent N daily rows.
-# Keeps the model adaptive to the current regime.
-# Set to None to use all history (not recommended after a regime change).
+# Set to None to use all history.
 ROLLING_TRAIN_WINDOW = 500
 
 # Recency weighting: sample weight halves every N days.
-# Lower = faster adaptation to regime changes but less stable.
-# 60–90 days is a good range for index trading.
 WEIGHT_HALF_LIFE_DAYS = 90
 
 # Confidence gate: if |prob_up - 0.5| < this, output NEUTRAL instead of UP/DOWN.
-# Reduces false precision. Set to 0 to disable.
-CONFIDENCE_THRESHOLD = 0.06   # i.e., prob must be < 0.44 or > 0.56 to call direction
+# Set to 0 to disable.
+CONFIDENCE_THRESHOLD = 0.06
 
-# LightGBM — deliberately shallow + early stopping to avoid overfitting
+# LightGBM — shallow + early stopping to avoid overfitting
 LGB_PARAMS = dict(
     objective         = "binary",
     metric            = "binary_logloss",
-    n_estimators      = 500,          # raised ceiling; early stopping will cut it down
+    n_estimators      = 500,
     learning_rate     = 0.03,
     max_depth         = 4,
     num_leaves        = 12,
@@ -118,20 +78,20 @@ VALIDATION_FRAC       = 0.10   # last 10% of training rows used as eval set
 
 
 # ─────────────────────────────────────────────────────────
-# INTRADAY FETCH  (unchanged)
+# INTRADAY FETCH
 # ─────────────────────────────────────────────────────────
 def fetch_intraday_today(idNotation: str) -> pd.DataFrame:
     """
     Fetch today's 3-min bars from OnVista chart_history endpoint.
-    Returns clean DataFrame with columns:
-        datetime, open, high, low, close, volume, n_trades
-    Last 2 rows (session-close artifact) are dropped.
+    Returns a clean DataFrame or an empty DataFrame when the market is closed
+    or no data is available.
     """
     url = (
         f"https://api.onvista.de/api/v1/instruments/INDEX/{idNotation}"
         f"/chart_history?idNotation={idNotation}"
         f"&range=D1&resolution=3m&withCurrentDay=true&withEarnings=false"
     )
+
     try:
         r = requests.get(url, timeout=15)
         if r.status_code != 200:
@@ -141,50 +101,61 @@ def fetch_intraday_today(idNotation: str) -> pd.DataFrame:
         print(f"[Intraday] fetch failed for {idNotation}: {e}")
         return pd.DataFrame()
 
-    if "datetimeLast" not in parsed:
+    ts_list = parsed.get("datetimeLast", [])
+    closes  = parsed.get("last", [])
+
+    if not ts_list or not closes:
+        print("[Intraday] No intraday data → market closed or holiday")
         return pd.DataFrame()
 
-    ts_list  = parsed["datetimeLast"]
-    opens    = parsed.get("first",        parsed.get("last", []))
-    closes   = parsed.get("last",         [])
-    highs    = parsed.get("high",         closes)
-    lows     = parsed.get("low",          closes)
-    volumes  = parsed.get("volume",       [0] * len(ts_list))
-    n_trades = parsed.get("numberPrices", [0] * len(ts_list))
+    opens    = parsed.get("first", [])
+    highs    = parsed.get("high", [])
+    lows     = parsed.get("low", [])
+    volumes  = parsed.get("volume", [])
+    n_trades = parsed.get("numberPrices", [])
+
+    n = min(len(ts_list), len(closes))
 
     rows = []
-    for i, ts in enumerate(ts_list):
+    for i in range(n):
         rows.append({
-            "datetime": datetime.fromtimestamp(ts, tz=timezone.utc).replace(tzinfo=None),
-            "open":     opens[i],
-            "high":     highs[i],
-            "low":      lows[i],
+            "datetime": datetime.fromtimestamp(ts_list[i], tz=timezone.utc).astimezone().replace(tzinfo=None),
+            "open":     opens[i] if i < len(opens) else closes[i],
+            "high":     highs[i] if i < len(highs) else closes[i],
+            "low":      lows[i] if i < len(lows) else closes[i],
             "close":    closes[i],
-            "volume":   volumes[i],
-            "n_trades": n_trades[i],
+            "volume":   volumes[i] if i < len(volumes) else 0,
+            "n_trades": n_trades[i] if i < len(n_trades) else 0,
         })
+
+    if not rows:
+        return pd.DataFrame()
 
     df = pd.DataFrame(rows)
     df["datetime"] = pd.to_datetime(df["datetime"])
     df = df.sort_values("datetime").reset_index(drop=True)
 
-    if len(df) > 4:
+    if len(df) > 10:
         df = df.iloc[:-2].copy()
+
+    # Reject stale data: the API sometimes returns the previous session's bars
+    # (e.g. DAX on a Sunday returning Friday data). Treat that as no data.
+    today = datetime.now().date()
+    if df["datetime"].iloc[-1].date() != today:
+        print(f"[Intraday] Last bar date {df['datetime'].iloc[-1].date()} ≠ today ({today}) → discarding")
+        return pd.DataFrame()
 
     return df
 
 
 # ─────────────────────────────────────────────────────────
-# INTRADAY FEATURES  (kept separate from ML model — BUG 1 fix)
+# INTRADAY FEATURES
 # ─────────────────────────────────────────────────────────
 def extract_intraday_features(df_intra: pd.DataFrame) -> dict:
     """
-    Extract 7 scalar features from today's 3-min bars.
-
-    NOTE: These are NO LONGER fed into the LightGBM model.
-    They are used only for the human-readable intraday summary
-    and as a separate directional signal shown in the message.
-    This avoids the train/predict NaN mismatch (BUG 1).
+    Extract scalar features from today's 3-min bars.
+    Used only for the human-readable intraday summary and as a separate
+    directional signal — not fed into the LightGBM model.
     """
     nan_result = {
         "intra_close_pos":    np.nan,
@@ -258,42 +229,39 @@ def extract_intraday_features(df_intra: pd.DataFrame) -> dict:
 def intraday_direction_signal(intra: dict) -> str:
     """
     Produce a simple ▲/▼/~ signal from intraday features.
-    This replaces the previous (broken) ML use of intraday features.
     Each sub-signal votes; majority wins.
     """
     if all(np.isnan(v) for v in intra.values()):
         return "~"
 
-    votes_up = 0
-    votes_dn = 0
+    score = 0
 
     cp = intra.get("intra_close_pos", np.nan)
     if not np.isnan(cp):
-        if cp > 0.60: votes_up += 1
-        elif cp < 0.40: votes_dn += 1
+        if cp > 0.6: score += 1
+        elif cp < 0.4: score -= 1
 
     r2h = intra.get("intra_last2h_ret", np.nan)
     if not np.isnan(r2h):
-        if r2h > 0.002: votes_up += 1
-        elif r2h < -0.002: votes_dn += 1
+        if r2h > 0.002: score += 1
+        elif r2h < -0.002: score -= 1
 
     mh = intra.get("intra_macd_hist", np.nan)
     if not np.isnan(mh):
-        if mh > 0: votes_up += 1
-        else: votes_dn += 1
+        score += 2 if mh > 0 else -2
 
     vd = intra.get("intra_vwap_dev", np.nan)
     if not np.isnan(vd):
-        if vd > 0.05: votes_up += 1
-        elif vd < -0.05: votes_dn += 1
+        if vd > 0.05: score += 2
+        elif vd < -0.05: score -= 2
 
-    if votes_up > votes_dn: return "▲"
-    if votes_dn > votes_up: return "▼"
+    if score >= 2: return "▲"
+    if score <= -2: return "▼"
     return "~"
 
 
 # ─────────────────────────────────────────────────────────
-# DAILY FEATURE ENGINEERING  (unchanged)
+# DAILY FEATURE ENGINEERING
 # ─────────────────────────────────────────────────────────
 DAILY_FEATURE_COLS = [
     "momentum_norm", "mom_delta", "mom_lag1", "mom_lag2", "mom_lag3",
@@ -302,9 +270,10 @@ DAILY_FEATURE_COLS = [
     "RSI14", "RSI14_lag1",
     "ADX14",
     "vol_factor",
-    "trend_long", "ema_cross", "supertrend_dir",
-    "is_dark_red", "is_dark_red_2nd",
-    "dow", "month_end", "month_start",
+    "dow",
+    # removed: "trend_long", "ema_cross", "supertrend_dir",
+    # removed: "is_dark_red", "is_dark_red_2nd",
+    # removed: "month_end", "month_start",
 ]
 
 
@@ -344,77 +313,83 @@ def engineer_daily_features(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # ─────────────────────────────────────────────────────────
-# SAMPLE WEIGHTS  (BUG 2 fix — recency weighting)
+# SAMPLE WEIGHTS
 # ─────────────────────────────────────────────────────────
 def make_sample_weights(n: int, half_life: int) -> np.ndarray:
     """
     Exponential decay weights: the most recent row has weight 1,
-    a row half_life days ago has weight 0.5, etc.
-    Weights are normalised to sum to n (so LightGBM leaf sizes stay meaningful).
+    a row half_life days ago has weight 0.5.
+    Normalised to sum to n so LightGBM leaf sizes remain meaningful.
     """
-    ages    = np.arange(n - 1, -1, -1, dtype=float)   # 0 = most recent
+    ages    = np.arange(n - 1, -1, -1, dtype=float)
     weights = np.exp(-np.log(2) * ages / half_life)
     weights = weights / weights.sum() * n
     return weights
 
 
 # ─────────────────────────────────────────────────────────
-# MODEL FITTING  (BUG 3 fix — early stopping)
+# MODEL FITTING
 # ─────────────────────────────────────────────────────────
 def _fit_lgb(X_train: np.ndarray,
              y_train: np.ndarray,
              w_train: np.ndarray) -> lgb.LGBMClassifier:
     """
-    Fit LightGBM with early stopping against a held-out validation slice.
-    The validation slice is the last VALIDATION_FRAC of training rows
-    (most recent data = hardest test of current regime knowledge).
+    Fit LightGBM with early stopping against a held-out validation slice
+    (last VALIDATION_FRAC of training rows).
+    LightGBM's raw probabilities are well-calibrated enough for directional
+    trading signals, so no additional calibration step is needed.
+    Returns the fitted LGBMClassifier.
     """
-    n_val   = max(1, int(len(X_train) * VALIDATION_FRAC))
-    n_tr    = len(X_train) - n_val
+    n_val = max(1, int(len(X_train) * VALIDATION_FRAC))
+    n_tr  = len(X_train) - n_val
 
     X_tr, X_val = X_train[:n_tr], X_train[n_tr:]
     y_tr, y_val = y_train[:n_tr], y_train[n_tr:]
     w_tr        = w_train[:n_tr]
 
-    model = lgb.LGBMClassifier(**LGB_PARAMS)
+    scale_pos_weight = (y_tr == 0).sum() / max((y_tr == 1).sum(), 1)
+
+    model = lgb.LGBMClassifier(**LGB_PARAMS, scale_pos_weight=scale_pos_weight)
     model.fit(
         X_tr, y_tr,
-        sample_weight   = w_tr,
-        eval_set        = [(X_val, y_val)],
-        callbacks       = [lgb.early_stopping(EARLY_STOPPING_ROUNDS, verbose=False),
-                           lgb.log_evaluation(period=-1)],
+        sample_weight = w_tr,
+        eval_set      = [(X_val, y_val)],
+        callbacks     = [lgb.early_stopping(EARLY_STOPPING_ROUNDS, verbose=False),
+                         lgb.log_evaluation(period=-1)],
     )
+
     return model
 
 
 # ─────────────────────────────────────────────────────────
-# WALK-FORWARD LightGBM  (all 4 bugs fixed)
+# WALK-FORWARD LIGHTGBM
 # ─────────────────────────────────────────────────────────
 def walk_forward_predict(df: pd.DataFrame) -> tuple:
     """
-    Walk-forward training + prediction using DAILY features only.
-
-    Changes vs original:
-    - Intraday features removed from ML (BUG 1)
-    - Exponential sample weights (BUG 2)
-    - Early stopping (BUG 3)
-    - WF accuracy now honestly reflects daily-only model (BUG 4)
-    - Rolling training window (ROLLING_TRAIN_WINDOW) for regime adaptability
+    Walk-forward training and prediction using daily features only.
 
     Returns
     -------
     prob_up      : float [0,1] | None
     wf_acc       : float [0,1] | None
     n_signals    : int  — dark-red bars in last 252 rows
-    n_trees_used : int  — actual trees used by final model (early stopping)
+    n_trees_used : int  — actual trees used by final model after early stopping
     """
     df = engineer_daily_features(df)
-    df["target"] = (df["close"].shift(-1) > df["close"]).astype(float)
+    
+    # ATR-based threshold: scales with recent volatility instead of fixed 0.4%
+    atr_pct   = (df["high"].rolling(14).max() - df["low"].rolling(14).min()) / df["close"]
+    threshold = (atr_pct.shift(1) * 0.4).fillna(0.004)
 
-    required = ["momentum_norm", "RSI14", "ADX14", "supertrend_dir", "vol_factor"]
-    df_model = df.dropna(subset=required + ["target"]).copy()
+    ret = df["close"].shift(-1) / df["close"] - 1
+    df["target"] = np.where(
+        ret >  threshold, 1,
+        np.where(ret < -threshold, 0, np.nan)
+    )
 
-    # Rolling window: keep only recent rows
+    required  = ["momentum_norm", "RSI14", "ADX14", "supertrend_dir", "vol_factor"]
+    df_model  = df.dropna(subset=required + ["target"]).copy()
+
     if ROLLING_TRAIN_WINDOW and len(df_model) > ROLLING_TRAIN_WINDOW:
         df_model = df_model.tail(ROLLING_TRAIN_WINDOW).copy()
 
@@ -426,32 +401,54 @@ def walk_forward_predict(df: pd.DataFrame) -> tuple:
     y = df_model["target"].astype("int64").to_numpy()
 
     # ── Walk-forward accuracy ──────────────────────────────────────────────────
-    test_start  = max(WF_MIN_TRAIN, n - WF_ACCURACY_WINDOW)
+    test_start = max(WF_MIN_TRAIN, n - WF_ACCURACY_WINDOW)
     preds_wf, true_wf = [], []
+    wf_log = []
 
+    RETRAIN_EVERY = 5
+    mdl = None
     for t in range(test_start, n):
-        w   = make_sample_weights(t, WEIGHT_HALF_LIFE_DAYS)
-        mdl = _fit_lgb(X[:t], y[:t], w)
-        p   = mdl.predict_proba(X[t:t+1])[0][1]
+        if mdl is None or (t - test_start) % RETRAIN_EVERY == 0:
+            w   = make_sample_weights(t, WEIGHT_HALF_LIFE_DAYS)
+            mdl = lgb.LGBMClassifier(**LGB_PARAMS)
+            mdl.fit(X[:t], y[:t], sample_weight=w)
+
+        p = mdl.predict_proba(X[t:t+1])[0][1]
         preds_wf.append(1 if p >= 0.5 else 0)
         true_wf.append(y[t])
 
+        wf_log.append({
+            "date":      df_model["date"].iloc[t],
+            "prob_up":   round(p, 4),
+            "predicted": 1 if p >= 0.5 else 0,
+            "actual":    y[t],
+            "correct":   int((1 if p >= 0.5 else 0) == y[t]),
+            "neutral":   int(abs(p - 0.5) < CONFIDENCE_THRESHOLD),
+        })
+
     wf_acc = (float(np.mean(np.array(preds_wf) == np.array(true_wf)))
               if preds_wf else None)
+    
+    # ── Save log to CSV (one file per ticker) ─────────────────────────────────
+    if wf_log:                                           # ← ADD THIS BLOCK
+        ticker_name = df_model["ticker"].iloc[0] if "ticker" in df_model.columns else "unknown"
+        clean_name  = re.sub(r"[^A-Za-z0-9]", "", str(ticker_name))
+        log_path    = f"wf_log_{clean_name}.csv"
+        pd.DataFrame(wf_log).to_csv(log_path, index=False)
 
-    # ── Final model: train on all rows except last ─────────────────────────────
+    # ── Final model: train on all rows, predict the last row ──────────────────
     w_final     = make_sample_weights(n - 1, WEIGHT_HALF_LIFE_DAYS)
     final_model = _fit_lgb(X[:-1], y[:-1], w_final)
     prob_up     = float(final_model.predict_proba(X[-1:])[0][1])
-    n_trees     = final_model.best_iteration_ or LGB_PARAMS["n_estimators"]
 
-    n_signals = int(df_model["is_dark_red"].tail(252).sum())
+    n_trees = getattr(final_model, "best_iteration_", LGB_PARAMS["n_estimators"])
+    n_signals   = int(df_model["is_dark_red"].tail(252).sum())
 
     return prob_up, wf_acc, n_signals, n_trees
 
 
 # ─────────────────────────────────────────────────────────
-# DIRECTION LABEL  (BUG 4 fix — confidence gate)
+# DIRECTION LABEL
 # ─────────────────────────────────────────────────────────
 def direction_label(prob_up: float) -> str:
     """
@@ -474,12 +471,17 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180):
 
     os.makedirs("docs", exist_ok=True)
 
-    cutoff_date  = pd.Timestamp.today().normalize() - pd.Timedelta(days=period_days)
-    df_recent    = df_stocks[df_stocks["date"] > cutoff_date].copy()
-
     df_list      = pd.read_csv(LIST_INDEX)
     notation_map = dict(zip(df_list["ticker"].astype(str),
                             df_list["idNotation"].astype(str)))
+
+    cutoff_date = pd.Timestamp.today().normalize() - pd.Timedelta(days=period_days)
+    df_recent   = df_stocks[df_stocks["date"] > cutoff_date].copy()
+    today_str   = datetime.today().strftime("%d.%m.%Y")
+
+    # Collect tickers whose intraday data is missing or stale (closed market, holiday).
+    # These are reported in one grouped message; no chart or GPT is triggered for them.
+    closed_tickers = []
 
     for ticker in tqdm(df_recent["ticker"].unique(), desc="Generating messages..."):
         df_ticker = df_recent[df_recent["ticker"] == ticker].sort_values("date")
@@ -489,60 +491,71 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180):
         latest = df_ticker.iloc[-1]
         prev   = df_ticker.iloc[-2]
 
-        # ── Fetch intraday ───────────────────────────────────────────────────
-        idNotation     = notation_map.get(str(ticker), "")
-        df_intra       = fetch_intraday_today(idNotation) if idNotation else pd.DataFrame()
-        intra_features = extract_intraday_features(df_intra)
-        has_intraday   = not df_intra.empty
+        # ── Fetch intraday — empty means no today data (stale or market closed) ──
+        idNotation = notation_map.get(str(ticker), "")
+        df_intra   = fetch_intraday_today(idNotation) if idNotation else pd.DataFrame()
 
-        # ── Intraday summary ─────────────────────────────────────────────────
-        if not df_intra.empty and len(df_intra) > 4:
-            last_intra_time = df_intra["datetime"].iloc[-1].strftime("%d.%m.%Y %H:%M CET")
-            open_price  = df_intra["open"].iloc[0]
-            close_price = df_intra["close"].iloc[-1]
-            day_high    = df_intra["high"].max()
-            day_low     = df_intra["low"].min()
-            close_pos   = (close_price / open_price - 1) * 100
-            max_pos     = (day_high    / open_price - 1) * 100
-            min_pos     = (day_low     / open_price - 1) * 100
-            net_dir     = "↗️" if close_price > open_price else "↘️"
-            intra_sig   = intraday_direction_signal(intra_features)
-            intra_header = (
-                f"<b>Intraday:</b> {last_intra_time}\n"
-                f"Day P&L: {close_pos:.1f}% {net_dir}\n"
-                f"Max: {max_pos:.1f}%  ·  Min: {min_pos:.1f}%\n"
-                f"Intraday signal: {intra_sig}"
-            )
-        else:
-            intra_header = "No intraday data"
+        if df_intra.empty:
+            closed_tickers.append(ticker)
+            continue   # skip chart, GPT, and full message for this ticker
 
-        # ── ML prediction (daily only — BUG 1 fix) ──────────────────────────
+        # ── Intraday features & summary ──────────────────────────────────────
+        intra_features  = extract_intraday_features(df_intra)
+        tz_label        = datetime.now().astimezone().strftime("%Z")
+        last_intra_time = df_intra["datetime"].iloc[-1].strftime(f"%d.%m.%Y %H:%M {tz_label}")
+        open_price      = df_intra["open"].iloc[0]
+        close_price     = df_intra["close"].iloc[-1]
+        day_high        = df_intra["high"].max()
+        day_low         = df_intra["low"].min()
+        close_pos       = (close_price / open_price - 1) * 100
+        max_pos         = (day_high    / open_price - 1) * 100
+        min_pos         = (day_low     / open_price - 1) * 100
+        net_dir         = "↗️" if close_price > open_price else "↘️"
+        intra_sig       = intraday_direction_signal(intra_features)
+        intra_header    = (
+            f"<b>Intraday:</b> {last_intra_time}\n"
+            f"Day P&L: {close_pos:.1f}% {net_dir}\n"
+            f"Max: {max_pos:.1f}%  ·  Min: {min_pos:.1f}%\n"
+            f"Intraday signal: {intra_sig}"
+        )
+
+        # ── ML prediction (daily features only) ─────────────────────────────
         df_full = df_stocks[df_stocks["ticker"] == ticker].sort_values("date").copy()
         prob_up, wf_acc, n_signals, n_trees = walk_forward_predict(df_full)
 
         if prob_up is not None:
-            prob_down  = 1.0 - prob_up
-            direction  = direction_label(prob_up)
-            acc_str    = f"{wf_acc*100:.1f}%" if wf_acc is not None else "N/A"
-            conf_str   = f"{abs(prob_up - 0.5)*100:.1f}pp"  # distance from 50%
-            prob_text  = (
+            final_score = prob_up - 0.5
+            if intra_sig == "▲":
+                final_score += 0.05
+            elif intra_sig == "▼":
+                final_score -= 0.05
+
+            prob_combined = min(max(0.5 + final_score, 0.01), 0.99)
+            prob_up       = prob_combined
+            prob_down     = 1.0 - prob_combined
+
+            direction = direction_label(prob_up)
+            acc_str   = f"{wf_acc*100:.1f}%" if wf_acc is not None else "N/A"
+            conf_str  = f"{abs(prob_up - 0.5)*100:.1f}pp"
+            prob_text = (
                 f"Predicted: <b>{direction}</b>\n"
                 f"UP 📈 {prob_up*100:.1f}%  ·  DOWN 📉 {prob_down*100:.1f}%\n"
-                f"Confidence: {conf_str} | Accuracy: {acc_str}\n"
-                f"Trees used: {n_trees} (of {LGB_PARAMS['n_estimators']} max)"
+                #f"Confidence: {conf_str} | Accuracy: {acc_str}\n"
+                f"Accuracy: {acc_str}\n"                
+                #f"Trees used: {n_trees} (of {LGB_PARAMS['n_estimators']} max)"
             )
         else:
             prob_text = "ML: N/A (insufficient history)"
 
         # ── GPT advice ───────────────────────────────────────────────────────
         signal = GPT_trader_analysis.build_signal(
-            ticker        = ticker,
-            latest        = latest,
-            prob_up       = prob_up if prob_up is not None else 0.5,
-            wf_acc        = wf_acc,
-            has_intraday  = has_intraday,
-            df_intra      = df_intra,
-            intra_features= intra_features,
+            ticker         = ticker,
+            latest         = latest,
+            prob_up        = prob_up if prob_up is not None else 0.5,
+            wf_acc         = wf_acc,
+            has_intraday   = True,
+            df_intra       = df_intra,
+            intra_features = intra_features,
         )
         gpt_advice = GPT_trader_analysis.get_trader_advice(signal)
 
@@ -603,8 +616,8 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180):
             f"────────────────\n"
             f"{intra_header}\n"
             f"────────────────\n"
-            f"{prob_text}\n"
-            f"────────────────\n"
+            #f"{prob_text}\n"
+            #f"────────────────\n"
             f"{gpt_advice}\n"
         )
 
@@ -613,6 +626,19 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180):
 
         if os.path.exists(fn_png):
             os.remove(fn_png)
+
+    # ── Single grouped message for all tickers with no today data ────────────
+    if closed_tickers:
+        ticker_list = "\n".join(f"  · {t}" for t in closed_tickers)
+        index_information.send_telegram(
+            "sendMessage",
+            text=(
+                f"<b>{today_str} — No intraday data 🏖️</b>\n"
+                f"The following indices returned no data for today.\n"
+                f"Market may be closed (holiday or weekend):\n\n"
+                f"{ticker_list}"
+            ),
+        )
 
 
 # ─────────────────────────────────────────────────────────
