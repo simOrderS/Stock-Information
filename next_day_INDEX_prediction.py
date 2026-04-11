@@ -44,6 +44,7 @@ LIST_INDEX             = "liste_INDEX_OnVista.csv"
 # Walk-forward settings
 WF_MIN_TRAIN        = 200   # minimum daily rows before first prediction
 WF_ACCURACY_WINDOW  = 252   # evaluate accuracy on last ~1 year of rows
+WF_MIN_TEST_ROWS    = 30    # FIX 1: guarantee at least this many test rows
 
 # Rolling training window — only use the most recent N daily rows.
 # Set to None to use all history.
@@ -55,6 +56,12 @@ WEIGHT_HALF_LIFE_DAYS = 90
 # Confidence gate: if |prob_up - 0.5| < this, output NEUTRAL instead of UP/DOWN.
 # Set to 0 to disable.
 CONFIDENCE_THRESHOLD = 0.06
+
+# FIX 2: Cap the ATR-based target threshold so high-volatility regimes
+# don't neutralise almost all labels and collapse the training set.
+ATR_THRESHOLD_MULTIPLIER = 0.4
+ATR_THRESHOLD_CAP        = 0.015   # max allowed threshold (1.5 % daily move)
+ATR_THRESHOLD_DEFAULT    = 0.004   # fallback when ATR is not yet available
 
 # LightGBM — shallow + early stopping to avoid overfitting
 LGB_PARAMS = dict(
@@ -371,15 +378,20 @@ def walk_forward_predict(df: pd.DataFrame) -> tuple:
     Returns
     -------
     prob_up      : float [0,1] | None
-    wf_acc       : float [0,1] | None
+    wf_acc       : float [0,1] | None  (-1.0 sentinel means "insufficient history")
     n_signals    : int  — dark-red bars in last 252 rows
     n_trees_used : int  — actual trees used by final model after early stopping
     """
     df = engineer_daily_features(df)
-    
-    # ATR-based threshold: scales with recent volatility instead of fixed 0.4%
+
+    # ── FIX 2: cap ATR-based threshold so high-volatility regimes don't
+    #    neutralise almost all labels and collapse the training set. ──────────
     atr_pct   = (df["high"].rolling(14).max() - df["low"].rolling(14).min()) / df["close"]
-    threshold = (atr_pct.shift(1) * 0.4).fillna(0.004)
+    threshold = (
+        (atr_pct.shift(1) * ATR_THRESHOLD_MULTIPLIER)
+        .fillna(ATR_THRESHOLD_DEFAULT)
+        .clip(upper=ATR_THRESHOLD_CAP)          # ← cap added here
+    )
 
     ret = df["close"].shift(-1) / df["close"] - 1
     df["target"] = np.where(
@@ -395,13 +407,20 @@ def walk_forward_predict(df: pd.DataFrame) -> tuple:
 
     n = len(df_model)
     if n < WF_MIN_TRAIN:
-        return None, None, 0, 0
+        # FIX 3: return sentinel -1.0 so callers can distinguish "not computed"
+        # from a genuine 0 % accuracy score.
+        return None, -1.0, 0, 0
 
     X = df_model[DAILY_FEATURE_COLS].astype("float64").to_numpy()
     y = df_model["target"].astype("int64").to_numpy()
 
-    # ── Walk-forward accuracy ──────────────────────────────────────────────────
-    test_start = max(WF_MIN_TRAIN, n - WF_ACCURACY_WINDOW)
+    # ── FIX 1: guarantee a minimum test window ────────────────────────────────
+    # Without this, when n == WF_MIN_TRAIN the loop range is empty and
+    # wf_acc is never computed, which gets reported as 0 %.
+    raw_test_start = max(WF_MIN_TRAIN, n - WF_ACCURACY_WINDOW)
+    test_start     = min(raw_test_start, n - WF_MIN_TEST_ROWS)
+    test_start     = max(0, test_start)   # safety clamp — never go negative
+
     preds_wf, true_wf = [], []
     wf_log = []
 
@@ -427,10 +446,10 @@ def walk_forward_predict(df: pd.DataFrame) -> tuple:
         })
 
     wf_acc = (float(np.mean(np.array(preds_wf) == np.array(true_wf)))
-              if preds_wf else None)
-    
+              if preds_wf else -1.0)   # FIX 3: use -1.0 sentinel, not None
+
     # ── Save log to CSV (one file per ticker) ─────────────────────────────────
-    if wf_log:                                           # ← ADD THIS BLOCK
+    if wf_log:
         ticker_name = df_model["ticker"].iloc[0] if "ticker" in df_model.columns else "unknown"
         clean_name  = re.sub(r"[^A-Za-z0-9]", "", str(ticker_name))
         log_path    = f"wf_log_{clean_name}.csv"
@@ -441,8 +460,8 @@ def walk_forward_predict(df: pd.DataFrame) -> tuple:
     final_model = _fit_lgb(X[:-1], y[:-1], w_final)
     prob_up     = float(final_model.predict_proba(X[-1:])[0][1])
 
-    n_trees = getattr(final_model, "best_iteration_", LGB_PARAMS["n_estimators"])
-    n_signals   = int(df_model["is_dark_red"].tail(252).sum())
+    n_trees   = getattr(final_model, "best_iteration_", LGB_PARAMS["n_estimators"])
+    n_signals = int(df_model["is_dark_red"].tail(252).sum())
 
     return prob_up, wf_acc, n_signals, n_trees
 
@@ -523,6 +542,9 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180):
         df_full = df_stocks[df_stocks["ticker"] == ticker].sort_values("date").copy()
         prob_up, wf_acc, n_signals, n_trees = walk_forward_predict(df_full)
 
+        # FIX 3: treat the -1.0 sentinel as "not available" downstream
+        wf_acc_safe = wf_acc if (wf_acc is not None and wf_acc >= 0) else None
+
         if prob_up is not None:
             final_score = prob_up - 0.5
             if intra_sig == "▲":
@@ -535,13 +557,13 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180):
             prob_down     = 1.0 - prob_combined
 
             direction = direction_label(prob_up)
-            acc_str   = f"{wf_acc*100:.1f}%" if wf_acc is not None else "N/A"
+            acc_str   = f"{wf_acc_safe*100:.1f}%" if wf_acc_safe is not None else "N/A"
             conf_str  = f"{abs(prob_up - 0.5)*100:.1f}pp"
             prob_text = (
                 f"Predicted: <b>{direction}</b>\n"
                 f"UP 📈 {prob_up*100:.1f}%  ·  DOWN 📉 {prob_down*100:.1f}%\n"
                 #f"Confidence: {conf_str} | Accuracy: {acc_str}\n"
-                f"Accuracy: {acc_str}\n"                
+                f"Accuracy: {acc_str}\n"
                 #f"Trees used: {n_trees} (of {LGB_PARAMS['n_estimators']} max)"
             )
         else:
@@ -552,7 +574,7 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180):
             ticker         = ticker,
             latest         = latest,
             prob_up        = prob_up if prob_up is not None else 0.5,
-            wf_acc         = wf_acc,
+            wf_acc         = wf_acc_safe,   # FIX 3: pass None, not -1.0
             has_intraday   = True,
             df_intra       = df_intra,
             intra_features = intra_features,
