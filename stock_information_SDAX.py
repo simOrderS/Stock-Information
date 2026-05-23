@@ -29,7 +29,11 @@ TELEGRAM_TOKEN_SANDBOX = os.getenv("TELEGRAM_TOKEN_SANDBOX")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 DATA_FILE_DAX = "history_SDAX_gettex.csv"
 LIST_DAX = 'liste_SDAX_OnVista.csv'
-
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+    "Referer": "https://www.onvista.de/"
+}
 
 def send_telegram(method_name, text=None, url=None, document=None, filename=None, caption=None):
     TOKEN = TELEGRAM_TOKEN_SDAX
@@ -92,7 +96,7 @@ def get_stock_data(list_file, start_date, range_):
             f"/eod_history?idNotation={idNotation}&range={range_}&startDate={start_date}"
         )
 
-        r = requests.get(url)
+        r = requests.get(url, headers=HEADERS, timeout=10)
         parsed = r.json()
 
         if "datetimeLast" not in parsed:
@@ -140,7 +144,7 @@ def update_stock_data(list_file, df):
             f"/eod_history?idNotation={idNotation}&range=M1&startDate={start_date}"
         )
 
-        r = requests.get(url)
+        r = requests.get(url, headers=HEADERS, timeout=10)
         if r.status_code != 200:
             continue
 
@@ -190,7 +194,7 @@ def update_stock_data(list_file, df):
 def setup_database(list_file, data_file):    
     # Step 1: create file if not exists
     if not os.path.exists(data_file):
-        df_initial = get_stock_data(list_file, '2021-01-01', 'Y1')
+        df_initial = get_stock_data(list_file, '2024-01-01', 'Y1')
         df_initial['date'] = pd.to_datetime(df_initial['date']).dt.tz_localize(None)
         df_initial.to_csv(data_file, index=False)
         print(f"Initial file {data_file} generated")
