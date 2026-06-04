@@ -2,7 +2,7 @@ name: Generate Stock Profits Report
 
 on:
   schedule:
-    - cron: "30 2 * * 6"   
+    - cron: "45 4 * * 6"   
   workflow_dispatch:          # Also allows manual trigger
 
 permissions:
