@@ -1,8 +1,8 @@
 name: Generate Daily INDEX Charts
 
 on:
-  schedule:
-    - cron: "0 4 * * 2-6"
+  #schedule:
+  #  - cron: "0 4 * * 2-6"
   workflow_dispatch:      # also allows manual trigger
 
 permissions:
@@ -15,14 +15,14 @@ jobs:
     steps:
       # Step 1: Checkout the repo
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: true
           fetch-depth: 0
 
       # Step 2: Set up Python
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
