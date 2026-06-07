@@ -1,9 +1,9 @@
 Jinja2==3.1.6
-kaleido==1.2.0
+kaleido==0.2.1
 lightgbm==4.6.0
 numpy>=2.0.0
 pandas==3.0.3
-plotly==6.8.0
+plotly==5.22.0
 PyGithub==2.8.1
 python-telegram-bot[all]==22.7
 requests==2.32.5
