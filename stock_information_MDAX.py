@@ -652,6 +652,17 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         if latest["ADX14"] > 25 and prev["ADX14"] <= 25:
             adx += " <i>➜New❗</i>"
 
+        # --- Track whether anything actually changed today ---
+        has_new_signal = any([
+            latest["trend_long"] and not prev["trend_long"],
+            latest["supertrend_dir"] != prev["supertrend_dir"],
+            curr_rsi_state != prev_rsi_state,
+            latest["ADX14"] > 25 and prev["ADX14"] <= 25,
+        ])
+
+        if not has_new_signal:
+            continue  # skip this ticker, nothing new to report
+
         summary = (
             f"<b><a href='{broker_url}'>{ticker}</a></b> · {latest['date'].strftime('%d.%m.%Y')}\n"
             f"Trend: {trend}\n"
