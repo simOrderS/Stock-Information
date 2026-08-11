@@ -585,24 +585,6 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         latest = df_ticker.iloc[-1]
         prev = df_ticker.iloc[-2]
 
-        # Chart
-        title = f"{ticker} · {df_ticker['isin'].iloc[0]} · {latest['date'].strftime('%d.%m.%Y')}"
-        fig = plot_chart(df_ticker, title=title)
-
-        clean_ticker = re.sub(r"[^A-Za-z0-9]", "", ticker)
-
-        filename_png = f"{clean_ticker}.png"
-        filename_html = f"docs/{clean_ticker}.html"
-
-        fig.write_image(filename_png)
-        fig.write_html(filename_html, include_plotlyjs="cdn", full_html=True)
-
-        chart_url = f"{base_url_github}{clean_ticker}.html"
-
-        params = {"isin": df_ticker["isin"].iloc[0]}
-        #params = {'isin': df_ticker['isin'].unique()[0], 'model': 'trade', 'security': df_ticker['isin'].unique()[0], 'type': "BUY"}
-        broker_url = f"{base_url_scalable}{urllib.parse.urlencode(params)}"
-
         # Trend
         trend = "ON ✅" if latest["trend_long"] else "OFF ❌"
         if latest["trend_long"] and not prev["trend_long"]:
@@ -652,17 +634,44 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         if latest["ADX14"] > 25 and prev["ADX14"] <= 25:
             adx += " <i>➜New❗</i>"
 
-        # --- Track whether anything actually changed today ---
-        has_new_signal = any([
-            latest["trend_long"] and not prev["trend_long"],
-            latest["supertrend_dir"] != prev["supertrend_dir"],
-            curr_rsi_state != prev_rsi_state,
-            latest["ADX14"] > 25 and prev["ADX14"] <= 25,
-        ])
+        # --- Only alert on a fresh Supertrend flip that agrees with the long-term trend ---
+        supertrend_flipped = latest["supertrend_dir"] != prev["supertrend_dir"]
+
+        strong_long_setup = (
+            supertrend_flipped
+            and latest["supertrend_dir"] == 1      # flipped UP
+            and latest["trend_long"]                # AND long-term trend agrees
+        )
+
+        strong_short_setup = (
+            supertrend_flipped
+            and latest["supertrend_dir"] == -1     # flipped DOWN
+            and not latest["trend_long"]            # AND long-term trend agrees
+        )
+
+        has_new_signal = strong_long_setup or strong_short_setup
 
         if not has_new_signal:
-            continue  # skip this ticker, nothing new to report
+            continue
 
+        # Chart
+        title = f"{ticker} · {df_ticker['isin'].iloc[0]} · {latest['date'].strftime('%d.%m.%Y')}"
+        fig = plot_chart(df_ticker, title=title)
+
+        clean_ticker = re.sub(r"[^A-Za-z0-9]", "", ticker)
+
+        filename_png = f"{clean_ticker}.png"
+        filename_html = f"docs/{clean_ticker}.html"
+
+        fig.write_image(filename_png)
+        fig.write_html(filename_html, include_plotlyjs="cdn", full_html=True)
+
+        chart_url = f"{base_url_github}{clean_ticker}.html"
+
+        params = {"isin": df_ticker["isin"].iloc[0]}
+        #params = {'isin': df_ticker['isin'].unique()[0], 'model': 'trade', 'security': df_ticker['isin'].unique()[0], 'type': "BUY"}
+        broker_url = f"{base_url_scalable}{urllib.parse.urlencode(params)}"
+        
         summary = (
             f"<b><a href='{broker_url}'>{ticker}</a></b> · {latest['date'].strftime('%d.%m.%Y')}\n"
             f"Trend: {trend}\n"

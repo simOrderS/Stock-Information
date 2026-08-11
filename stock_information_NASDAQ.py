@@ -603,24 +603,6 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         #params = {'isin': df_ticker['isin'].unique()[0], 'model': 'trade', 'security': df_ticker['isin'].unique()[0], 'type': "BUY"}
         broker_url = f"{base_url_scalable}{urllib.parse.urlencode(params)}"
 
-        # Trend
-        trend = "ON ✅" if latest["trend_long"] else "OFF ❌"
-        if latest["trend_long"] and not prev["trend_long"]:
-            trend += " <i>➜New❗</i>"
-
-        # Supertrend
-        supertrend = "UP ✅" if latest["supertrend_dir"] == 1 else "DOWN ❌"
-        if latest["supertrend_dir"] != prev["supertrend_dir"]:
-            supertrend += " <i>➜New❗</i>"
-
-        # Volatility
-        if latest["vol_factor"] > 1.2:
-            volatility = "HIGH ❌"
-        elif latest["vol_factor"] < 0.8:
-            volatility = "LOW ✅"
-        else:
-            volatility = "Normal"
-
         # Momentum (context
         momentum = "Positive ✅" if latest["momentum_norm"] > 0 else "Negative ❌"
         
@@ -652,16 +634,43 @@ def generate_messages(df_stocks: pd.DataFrame, period_days: int = 180, plot: boo
         if latest["ADX14"] > 25 and prev["ADX14"] <= 25:
             adx += " <i>➜New❗</i>"
 
-        # --- Track whether anything actually changed today ---
-        has_new_signal = any([
-            latest["trend_long"] and not prev["trend_long"],
-            latest["supertrend_dir"] != prev["supertrend_dir"],
-            curr_rsi_state != prev_rsi_state,
-            latest["ADX14"] > 25 and prev["ADX14"] <= 25,
-        ])
+        # --- Only alert on a fresh Supertrend flip that agrees with the long-term trend ---
+        supertrend_flipped = latest["supertrend_dir"] != prev["supertrend_dir"]
+
+        strong_long_setup = (
+            supertrend_flipped
+            and latest["supertrend_dir"] == 1      # flipped UP
+            and latest["trend_long"]                # AND long-term trend agrees
+        )
+
+        strong_short_setup = (
+            supertrend_flipped
+            and latest["supertrend_dir"] == -1     # flipped DOWN
+            and not latest["trend_long"]            # AND long-term trend agrees
+        )
+
+        has_new_signal = strong_long_setup or strong_short_setup
 
         if not has_new_signal:
-            continue  # skip this ticker, nothing new to report
+            continue
+
+        # Trend
+        trend = "ON ✅" if latest["trend_long"] else "OFF ❌"
+        if latest["trend_long"] and not prev["trend_long"]:
+            trend += " <i>➜New❗</i>"
+
+        # Supertrend
+        supertrend = "UP ✅" if latest["supertrend_dir"] == 1 else "DOWN ❌"
+        if latest["supertrend_dir"] != prev["supertrend_dir"]:
+            supertrend += " <i>➜New❗</i>"
+
+        # Volatility
+        if latest["vol_factor"] > 1.2:
+            volatility = "HIGH ❌"
+        elif latest["vol_factor"] < 0.8:
+            volatility = "LOW ✅"
+        else:
+            volatility = "Normal"
 
         summary = (
             f"<b><a href='{broker_url}'>{ticker}</a></b> · {latest['date'].strftime('%d.%m.%Y')}\n"
